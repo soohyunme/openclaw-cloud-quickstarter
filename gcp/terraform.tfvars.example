@@ -1,0 +1,17 @@
+# === GCP Always Free Tier (Default) ===
+# project_id = "my-gcp-project-123"
+# region     = "us-central1"
+# zone       = "us-central1-a"
+# machine_type = "e2-micro"
+# disk_size_gb = 30
+# disk_type  = "pd-standard"
+
+# === Performance Config (Paid) ===
+# Uncomment below for better performance (Cost: ~$25/mo)
+# machine_type = "e2-medium"     # 2 vCPU, 4GB RAM
+# disk_size_gb = 50              # 50GB
+# disk_type    = "pd-balanced"   # Faster SSD
+
+# === OpenClaw AI Model ===
+# openclaw_model = "claude-3-5-sonnet-20241022"
+# llm_api_key    = "sk-ant-..."

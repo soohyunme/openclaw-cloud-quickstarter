@@ -1,0 +1,17 @@
+# === Oracle Always Free Tier (Default) ===
+# instance_shape        = "VM.Standard.A1.Flex"
+# instance_ocpus        = 4
+# instance_memory_in_gbs = 24
+# boot_volume_size_in_gbs = 50
+# availability_domain_number = 1
+
+# === Performance Config (Paid) ===
+# Uncomment below for paid shapes (Intel/AMD)
+# instance_shape        = "VM.Standard.E4.Flex" 
+# instance_ocpus        = 8
+# instance_memory_in_gbs = 64
+# boot_volume_size_in_gbs = 200
+
+# === OpenClaw AI Model ===
+# openclaw_model = "claude-3-5-sonnet-20241022"
+# llm_api_key    = "sk-ant-..."

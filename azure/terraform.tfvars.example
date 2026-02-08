@@ -1,0 +1,15 @@
+# === Azure Free Tier (Default) ===
+# resource_group_location = "eastus"
+# vm_size                 = "Standard_B1s"
+# os_disk_size_gb         = 64
+# os_disk_type            = "Standard_LRS"
+
+# === Performance Config (Paid) ===
+# Uncomment below for better performance (Cost: ~$15-30/mo)
+# vm_size                 = "Standard_B2s"     # 2 vCPU, 4GB RAM
+# os_disk_size_gb         = 128                # 128GB
+# os_disk_type            = "Premium_LRS"      # Faster SSD
+
+# === OpenClaw AI Model ===
+# openclaw_model = "claude-3-5-sonnet-20241022"
+# llm_api_key    = "sk-ant-..."
