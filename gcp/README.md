@@ -104,12 +104,6 @@ Once deployment is complete (approx. 10-20 minutes), SSH into your server:
     pm2 status
     ```
 
-Once deployment is complete (approx. 5-10 minutes), connect using `gcloud`:
-
-```bash
-gcloud compute ssh openclaw-server --zone=us-central1-a
-```
-
 ### 🪄 The Onboarding Wizard
 To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:
 ```bash

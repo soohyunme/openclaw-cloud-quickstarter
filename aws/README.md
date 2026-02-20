@@ -95,12 +95,22 @@ If CloudShell expires, you can connect from your own computer (Mac/Linux/WSL):
 
 ---
 
-## 🎉 Finalizing Setup
+Once deployment is complete (approx. 15-20 minutes), SSH into your server:
 
-Once deployment is complete (approx. 5-10 minutes), SSH into your server:
-```bash
-ssh -i ~/.ssh/id_rsa ubuntu@<YOUR_INSTANCE_IP>
-```
+1.  **Open Cloud Shell** (if not already open).
+2.  **SSH Command:**
+    ```bash
+    ssh -i ~/.ssh/id_rsa ubuntu@<YOUR_INSTANCE_IP>
+    ```
+3.  **Monitor Progress:**
+    ```bash
+    ./check-progress.sh
+    ```
+4.  **Verify Service:**
+    Wait for setup to complete, then run:
+    ```bash
+    pm2 status
+    ```
 
 ### 🪄 The Onboarding Wizard
 To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:

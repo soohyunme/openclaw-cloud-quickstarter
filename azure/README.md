@@ -73,12 +73,22 @@ Review the execution plan. If the proposed changes are correct, type **yes** to 
 
 ---
 
-## 🎉 Finalizing Setup
+Once deployment is complete (approx. 10-15 minutes), SSH into your server:
 
-Once deployment is complete (approx. 5-10 minutes), SSH into your server:
-```bash
-ssh azureuser@<YOUR_INSTANCE_IP>
-```
+1.  **Open Cloud Shell** (if not already open).
+2.  **SSH Command:**
+    ```bash
+    ssh azureuser@<YOUR_INSTANCE_IP>
+    ```
+3.  **Monitor Progress:**
+    ```bash
+    ./check-progress.sh
+    ```
+4.  **Verify Service:**
+    Wait for setup to complete, then run:
+    ```bash
+    pm2 status
+    ```
 
 ### 🪄 The Onboarding Wizard
 To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:

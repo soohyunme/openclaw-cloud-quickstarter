@@ -95,11 +95,6 @@ Once deployment is complete (approx. 10-20 minutes), SSH into your server:
 
 ## 🎉 Finalizing Setup
 
-Once deployment is complete, SSH into your server:
-```bash
-ssh ubuntu@<YOUR_INSTANCE_IP>
-```
-
 ### 🪄 The Onboarding Wizard
 To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:
 ```bash
