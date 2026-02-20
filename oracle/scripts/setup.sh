@@ -8,9 +8,32 @@ USER="ubuntu"
 cat <<EOF > /home/$USER/check-progress.sh
 #!/bin/bash
 echo "🦞 Monitoring OpenClaw installation logs..."
-echo "💡 Press Ctrl+C at any time to return to the shell."
+echo "💡 This view will automatically exit when setup is complete."
+echo "💡 (Or press Ctrl+C to return to shell manually anytime)"
 echo "-------------------------------------------------------------"
-tail -f /var/log/cloud-init-output.log
+
+# Start tail in background
+tail -f /var/log/cloud-init-output.log &
+TAIL_PID=\$!
+
+# Ensure tail is killed if script is interrupted
+trap "kill \$TAIL_PID 2>/dev/null" EXIT
+
+# Wait for completion marker
+while true; do
+  if grep -q "Cloud-init .* finished" /var/log/cloud-init-output.log; then
+    sleep 2
+    kill \$TAIL_PID 2>/dev/null
+    break
+  fi
+  sleep 2
+done
+
+echo -e "\n-------------------------------------------------------------"
+echo "✅ INSTALLATION COMPLETE!"
+echo "🚀 Your OpenClaw server is ready."
+echo "👉 Run 'openclaw onboard' to finish your setup!"
+echo "-------------------------------------------------------------"
 EOF
 chmod +x /home/$USER/check-progress.sh
 chown $USER:$USER /home/$USER/check-progress.sh
