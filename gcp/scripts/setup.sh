@@ -67,20 +67,20 @@ sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
     \"bind\": \"auto\",
     \"auth\": {
       \"mode\": \"token\",
-      \"token\": \"openclaw-token-\$(openssl rand -hex 16)\"
+      \"token\": \"openclaw-token-\$$(openssl rand -hex 16)\"
     }
   },
   \"models\": {
     \"providers\": {
-      \"\${PROVIDER}\": {
-        \"apiKey\": \"\${LLM_API_KEY}\"
+      \"$${PROVIDER}\": {
+        \"apiKey\": \"$${LLM_API_KEY}\"
       }
     }
   },
   \"agents\": {
     \"defaults\": {
       \"model\": {
-        \"primary\": \"\${PROVIDER}/\${MODEL}\"
+        \"primary\": \"$${PROVIDER}/$${MODEL}\"
       }
     }
   }
