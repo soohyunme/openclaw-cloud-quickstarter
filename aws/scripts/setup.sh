@@ -105,7 +105,7 @@ sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
       \"$${PROVIDER}\": {
         \"apiKey\": \"${LLM_API_KEY}\"$( [[ "$${PROVIDER}" == "moonshot" ]] && echo ",
         \"baseUrl\": \"https://api.moonshot.cn/v1\",
-        \"models\": [\"moonshot-v1-8k\", \"moonshot-v1-32k\", \"moonshot-v1-128k\"]" )
+        \"models\": [\"kimi-k2.5\", \"moonshot-v1-8k\", \"moonshot-v1-32k\", \"moonshot-v1-128k\"]" )
       }
     }
   },
