@@ -13,7 +13,7 @@ output "setup_instructions" {
   
   ⚠️ CRITICAL:
   1. Download 'terraform.tfstate' and your private key NOW to avoid session timeout loss.
-  2. Wait 10-20 minutes for OpenClaw installation to complete.
+  2. Wait 15-20 minutes for OpenClaw installation to complete (t3.micro is default for safety).
   3. Run 'pm2 status' to verify.
   EOT
 }

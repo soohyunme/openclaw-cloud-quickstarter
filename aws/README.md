@@ -39,7 +39,7 @@ cd openclaw-cloud-quickstarter/aws
 
 ### 🏗️ Default Infrastructure
 By default, this template provisions:
-- **Compute:** `t3.micro` (2 vCPU, 1GB RAM) - Free Tier.
+- **Compute:** `t3.micro` (2 vCPU, 1GB RAM) - Universal Free Tier.
 - **Fixed IP:** Elastic IP (EIP) attached to the instance.
 - **Network:** Dedicated VPC with a public subnet and Internet Gateway.
 - **Security:** Security Group rules for SSH (22) and OpenClaw Gateway (18789).
@@ -132,9 +132,9 @@ terraform destroy
 *   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
 
 ## 📝 Notes on Free Tier
-*   **Instance Type:** This template uses `t3.micro` which is Free Tier eligible for 12 months in most regions.
+*   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.
 *   **Public IP (EIP):** Includes one Elastic IP. AWS provides 750 hours of public IPv4 for free per month during the first 12 months.
-*   **Region:** Some older regions use t2, newer use t3. Check AWS Free Tier limits.
+*   **Region:** Free Tier rules can vary by region. **Always check the "Free Tier eligible" tag in your AWS Console** before launching.
 
 ---
 **Enjoy your personal AI Agent! 🦞**
