@@ -10,6 +10,9 @@ fi
 # Create a progress checker
 cat <<EOF > /home/$USER/check-progress.sh
 #!/bin/bash
+echo "🦞 Monitoring OpenClaw installation logs..."
+echo "💡 Press Ctrl+C at any time to return to the shell."
+echo "-------------------------------------------------------------"
 tail -f /var/log/cloud-init-output.log
 EOF
 chmod +x /home/$USER/check-progress.sh
