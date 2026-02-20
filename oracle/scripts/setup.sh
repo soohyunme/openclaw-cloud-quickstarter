@@ -33,6 +33,7 @@ echo -e "\n-------------------------------------------------------------"
 echo "✅ INSTALLATION COMPLETE!"
 echo "🚀 Your OpenClaw server is ready."
 echo "👉 Run 'openclaw onboard' to finish your setup!"
+echo "   (If 'openclaw' is not found, run 'source ~/.bashrc' or use its full path: ~/.local/bin/openclaw onboard)"
 echo "-------------------------------------------------------------"
 EOF
 chmod +x /home/$USER/check-progress.sh
@@ -76,6 +77,9 @@ export NODE_OPTIONS="--max-old-space-size=2048"
 sudo npm install -g pm2
 sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git --no-onboard"
 
+# 4b. Ensure command is globally accessible immediately
+sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
+
 # 5. Configure OpenClaw
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
@@ -103,7 +107,7 @@ sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
       \"$${PROVIDER}\": {
         \"apiKey\": \"${LLM_API_KEY}\"$( [[ "$${PROVIDER}" == "moonshot" ]] && echo ",
         \"baseUrl\": \"https://api.moonshot.cn/v1\",
-        \"models\": [\"kimi-k2.5\", \"moonshot-v1-8k\", \"moonshot-v1-32k\", \"moonshot-v1-128k\"]" )
+        \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]" )
       }
     }
   },
@@ -129,9 +133,11 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   sudo systemctl start pm2-$USER || true
   STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
   LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh)"
+  ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs."
+  ONBOARD_INFO="    (Check ~/check-progress.sh for details)"
 fi
 
 # 6. Firewall
@@ -146,6 +152,7 @@ echo -e " 🦞 Welcome to Your OpenClaw Server on Oracle Cloud! " | sudo tee -a 
 echo -e "=============================================================" | sudo tee -a /etc/motd
 echo -e "$${STATUS_LINE}" | sudo tee -a /etc/motd
 echo -e "$${LOG_INFO}" | sudo tee -a /etc/motd
+echo -e "$${ONBOARD_INFO}" | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
 
 echo "--- Setup Completed at $(date) ---"
