@@ -47,15 +47,15 @@ sudo -u $USER mkdir -p /home/$USER/.openclaw
 
 # Parse Provider and Model from OPENCLAW_MODEL (format: provider/model)
 if [[ "${OPENCLAW_MODEL}" == *"/"* ]]; then
-  PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
-  MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
+  export PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
+  export MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
 else
-  PROVIDER="anthropic"
-  MODEL="${OPENCLAW_MODEL}"
+  export PROVIDER="anthropic"
+  export MODEL="${OPENCLAW_MODEL}"
 fi
 
 # Create openclaw.json with the latest schema (2026.2.x)
-sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
+sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
 {
   \"gateway\": {
     \"mode\": \"local\",
@@ -67,7 +67,7 @@ sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
   },
   \"models\": {
     \"providers\": {
-      \"$${PROVIDER}\": {
+      \"\${PROVIDER}\": {
         \"apiKey\": \"${LLM_API_KEY}\"
       }
     }
@@ -75,7 +75,7 @@ sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
   \"agents\": {
     \"defaults\": {
       \"model\": {
-        \"primary\": \"$${PROVIDER}/$${MODEL}\"
+        \"primary\": \"\${PROVIDER}/\${MODEL}\"
       }
     }
   }

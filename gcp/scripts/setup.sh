@@ -46,21 +46,21 @@ sudo npm install -g pm2
 sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git --no-onboard"
 
 # 5. Configure OpenClaw
-LLM_API_KEY=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/LLM_API_KEY" -H "Metadata-Flavor: Google")
-OPENCLAW_MODEL=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/OPENCLAW_MODEL" -H "Metadata-Flavor: Google")
+export LLM_API_KEY=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/LLM_API_KEY" -H "Metadata-Flavor: Google")
+export OPENCLAW_MODEL=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/OPENCLAW_MODEL" -H "Metadata-Flavor: Google")
 
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
 # Parse Provider and Model from OPENCLAW_MODEL (format: provider/model)
 if [[ "${OPENCLAW_MODEL}" == *"/"* ]]; then
-  PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
-  MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
+  export PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
+  export MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
 else
-  PROVIDER="anthropic"
-  MODEL="${OPENCLAW_MODEL}"
+  export PROVIDER="anthropic"
+  export MODEL="${OPENCLAW_MODEL}"
 fi
 
-sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
+sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
 {
   \"gateway\": {
     \"mode\": \"local\",
@@ -72,15 +72,15 @@ sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
   },
   \"models\": {
     \"providers\": {
-      \"$${PROVIDER}\": {
-        \"apiKey\": \"${LLM_API_KEY}\"
+      \"\${PROVIDER}\": {
+        \"apiKey\": \"\${LLM_API_KEY}\"
       }
     }
   },
   \"agents\": {
     \"defaults\": {
       \"model\": {
-        \"primary\": \"$${PROVIDER}/$${MODEL}\"
+        \"primary\": \"\${PROVIDER}/\${MODEL}\"
       }
     }
   }
