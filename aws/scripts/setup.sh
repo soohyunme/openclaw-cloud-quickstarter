@@ -45,6 +45,15 @@ sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "c
 # 5. Configure OpenClaw (Fully Automated)
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
+# Parse Provider and Model from OPENCLAW_MODEL (format: provider/model)
+if [[ "${OPENCLAW_MODEL}" == *"/"* ]]; then
+  PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
+  MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
+else
+  PROVIDER="anthropic"
+  MODEL="${OPENCLAW_MODEL}"
+fi
+
 # Create openclaw.json with the latest schema (2026.2.x)
 sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
 {
@@ -58,7 +67,7 @@ sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
   },
   \"models\": {
     \"providers\": {
-      \"anthropic\": {
+      \"$${PROVIDER}\": {
         \"apiKey\": \"${LLM_API_KEY}\"
       }
     }
@@ -66,7 +75,7 @@ sudo -u $USER bash -c "cat <<EOF > /home/$USER/.openclaw/openclaw.json
   \"agents\": {
     \"defaults\": {
       \"model\": {
-        \"primary\": \"anthropic/${OPENCLAW_MODEL}\"
+        \"primary\": \"$${PROVIDER}/$${MODEL}\"
       }
     }
   }
