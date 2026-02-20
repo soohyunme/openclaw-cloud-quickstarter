@@ -81,7 +81,7 @@ Review the execution plan. If the proposed changes are correct, type **yes** to 
 
 #### 💾 How to Backup to Your Local PC:
 1.  **Download State:** In CloudShell, click **Actions** (top right) -> **Download File**. Path: `openclaw-cloud-quickstarter/aws/terraform.tfstate`
-2.  **Download Private Key:** Path: `/home/cloudshell-user/.ssh/id_rsa`
+2.  **Download Private Key:** Path: `.ssh/id_rsa`
 3.  **Store Safely:** Keep these together in a folder on your computer.
 
 #### 💻 How to Connect from Your Local PC (Safe Way):
