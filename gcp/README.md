@@ -87,7 +87,22 @@ This automatically handles your SSH keys securely.
 
 ---
 
-## 🎉 Finalizing Setup
+Once deployment is complete (approx. 10-20 minutes), SSH into your server:
+
+1.  **Open Cloud Shell** (if not already open).
+2.  **SSH Command:**
+    ```bash
+    gcloud compute ssh openclaw-server --zone=<YOUR_ZONE>
+    ```
+3.  **Monitor Progress:**
+    ```bash
+    ./check-progress.sh
+    ```
+4.  **Verify Service:**
+    Wait for setup to complete, then run:
+    ```bash
+    pm2 status
+    ```
 
 Once deployment is complete (approx. 5-10 minutes), connect using `gcloud`:
 

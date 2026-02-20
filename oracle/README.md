@@ -76,7 +76,22 @@ Review the execution plan. If the proposed changes are correct, type **yes** to 
     ssh ubuntu@<YOUR_INSTANCE_IP>
     ```
 
----
+Once deployment is complete (approx. 10-20 minutes), SSH into your server:
+
+1.  **Open Cloud Shell** (if not already open).
+2.  **SSH Command:**
+    ```bash
+    ssh ubuntu@<YOUR_INSTANCE_IP>
+    ```
+3.  **Monitor Progress:**
+    ```bash
+    ./check-progress.sh
+    ```
+4.  **Verify Service:**
+    Wait for setup to complete, then run:
+    ```bash
+    pm2 status
+    ```
 
 ## 🎉 Finalizing Setup
 

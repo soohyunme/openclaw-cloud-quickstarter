@@ -95,6 +95,9 @@ sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
 }
 EOF"
 
+# Automatically fix/fill provider-specific configuration
+sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
+
 # Start OpenClaw
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw

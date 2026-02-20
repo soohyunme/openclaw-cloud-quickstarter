@@ -91,6 +91,9 @@ sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
 }
 EOF"
 
+# Automatically fix/fill provider-specific configuration (important for Moonshot/Gemini)
+sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
+
 # Start OpenClaw Gateway as a service only if API Key is provided
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   # Use full path and handle cases where it might already be running

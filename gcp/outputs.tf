@@ -12,7 +12,7 @@ output "setup_instructions" {
   
   ⚠️ CRITICAL:
   1. Download 'terraform.tfstate' NOW to avoid session timeout loss.
-  2. Wait 10-20 minutes for installation to complete.
-  3. Run 'pm2 status' to verify.
+  2. RUN './check-progress.sh' to monitor installation (10-20 mins).
+  3. Run 'pm2 status' to verify completion.
   EOT
 }
