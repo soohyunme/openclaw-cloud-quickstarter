@@ -4,6 +4,14 @@ set -euo pipefail
 # Oracle default user
 USER="ubuntu"
 
+# Create a progress checker
+cat <<EOF > /home/$USER/check-progress.sh
+#!/bin/bash
+tail -f /var/log/cloud-init-output.log
+EOF
+chmod +x /home/$USER/check-progress.sh
+chown $USER:$USER /home/$USER/check-progress.sh
+
 # 0. Setup Swap
 if [ ! -f /swapfile ]; then
     sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
@@ -89,10 +97,10 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   sudo systemctl enable pm2-$USER || true
   sudo systemctl start pm2-$USER || true
   STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
-  LOG_INFO="    Check logs: pm2 logs openclaw"
+  LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh)"
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
-  LOG_INFO="    Action: Edit ~/.openclaw/openclaw.json then run 'pm2 start openclaw'"
+  LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs."
 fi
 
 # 6. Firewall
