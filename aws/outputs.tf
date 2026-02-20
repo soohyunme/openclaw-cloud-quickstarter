@@ -11,7 +11,7 @@ output "setup_instructions" {
   SSH Command: ssh -i ${var.private_key_path} ubuntu@${aws_eip.openclaw_eip.public_ip}
   
   ⚠️ IMPORTANT:
-  1. Wait 5-10 minutes for installation to complete.
+  1. Wait 10-20 minutes for installation to complete.
   2. OpenClaw is automatically configured and started with your API Key.
   3. Check status: ssh in and run 'pm2 status'
   EOT

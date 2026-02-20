@@ -99,7 +99,7 @@ terraform destroy
 ```
 
 ## ⚠️ Troubleshooting
-*   **Installation is slow:** On low-RAM instances (1GB), OpenClaw is built from source using a swap file. This can take up to 10 minutes. Please be patient.
+*   **Installation is slow:** On low-RAM instances (1GB), OpenClaw is built from source using a swap file. This can take 10-20 minutes. Please be patient.
 *   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
 
 ## 📝 Notes on Free Tier
