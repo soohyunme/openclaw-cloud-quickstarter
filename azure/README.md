@@ -52,17 +52,24 @@ terraform apply
 ```
 Review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
 
-### ⚠️ Crucial: Backup Your Files
-Terraform tracks your resources in `terraform.tfstate`, and your SSH key allows access to the server. **If these files are lost (e.g., Cloud Shell session expires), you will lose access to manage or connect to your resources.**
+### ⚠️ CRITICAL: Cloud Shell Session Timeout
+> [!WARNING]
+> Azure Cloud Shell is an **ephemeral session**. If you are idle or your browser closes, **all local files (including keys and `terraform.tfstate`) will be PERMANENTLY LOST.**
+> 
+> **You MUST download these files to your local PC immediately after `terraform apply`!**
 
-**To Backup:**
-1. After `terraform apply` finishes, click **Actions** (top right) -> **Download File**.
-2. Download both files to your local computer:
-   *   **State File:** `openclaw-cloud-quickstarter/azure/terraform.tfstate`
-   *   **Private Key:** `.ssh/id_rsa` (if generated)
+#### 💾 How to Backup to Your Local PC:
+1.  **Download State:** In Cloud Shell, click the **Upload/Download files** icon -> **Download**. Path: `openclaw-cloud-quickstarter/azure/terraform.tfstate`
+2.  **Download Private Key:** Path: `~/.ssh/id_rsa`
+3.  **Store Safely:** Keep these together in a folder on your computer.
 
-**To Restore:**
-If you start a new session, upload both files back to their respective folders before running any commands.
+#### 💻 How to Connect from Your Local PC (Safe Way):
+1.  Move the downloaded `id_rsa` to your PC's `~/.ssh/` folder.
+2.  **Set Permissions (Required):** `chmod 400 id_rsa`
+3.  **SSH Command:**
+    ```bash
+    ssh azureuser@<YOUR_INSTANCE_IP>
+    ```
 
 ---
 

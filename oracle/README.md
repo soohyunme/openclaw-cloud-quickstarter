@@ -58,16 +58,23 @@ terraform apply
 ```
 Review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
 
-### ⚠️ Crucial: Backup Your Files
-Terraform tracks your resources in a file called `terraform.tfstate`. **If this file is lost (e.g., Cloud Shell session expires), you cannot easily manage or destroy your resources.**
+### ⚠️ CRITICAL: Cloud Shell Session Timeout
+> [!WARNING]
+> OCI Cloud Shell is an **ephemeral session**. If you are idle or your browser closes, **your `terraform.tfstate` file will be PERMANENTLY LOST.**
+> 
+> **You MUST download the state file to your local PC immediately after `terraform apply`!**
 
-**To Backup:**
-1. After `terraform apply` finishes, click **Actions** (top right) -> **Download File**.
-2. Enter the path: `openclaw-cloud-quickstarter/oracle/terraform.tfstate`
-3. Save it to your local computer.
+#### 💾 How to Backup to Your Local PC:
+1.  **Download State:** In Cloud Shell, click **Actions** (top right) -> **Download File**. 
+2.  **Path:** `openclaw-cloud-quickstarter/oracle/terraform.tfstate`
+3.  **Private Key:** Ensure you also have the private key corresponding to the public key you provided in `TF_VAR_ssh_public_key`.
 
-**To Restore:**
-If you start a new session, upload the file back to the same folder before running any commands.
+#### 💻 How to Connect from Your Local PC (Safe Way):
+1.  **Set Permissions (Required):** `chmod 400 your_private_key.pem`
+2.  **SSH Command:**
+    ```bash
+    ssh ubuntu@<YOUR_INSTANCE_IP>
+    ```
 
 ---
 

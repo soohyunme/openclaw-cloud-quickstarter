@@ -6,13 +6,14 @@ output "public_ip" {
 output "setup_instructions" {
   value = <<EOT
   
-  ✅ AWS EC2 Instance Created & Configuration Started!
+  ✅ AWS EC2 Created & Configuration Started!
   
-  SSH Command: ssh -i ${var.private_key_path} ubuntu@${aws_eip.openclaw_eip.public_ip}
+  CloudShell SSH: ssh -i ${var.private_key_path} ubuntu@${aws_eip.openclaw_eip.public_ip}
+  Local PC SSH:    ssh -i ./id_rsa ubuntu@${aws_eip.openclaw_eip.public_ip} (Download key first!)
   
-  ⚠️ IMPORTANT:
-  1. Wait 10-20 minutes for installation to complete.
-  2. OpenClaw is automatically configured and started with your API Key.
-  3. Check status: ssh in and run 'pm2 status'
+  ⚠️ CRITICAL:
+  1. Download 'terraform.tfstate' and your private key NOW to avoid session timeout loss.
+  2. Wait 10-20 minutes for OpenClaw installation to complete.
+  3. Run 'pm2 status' to verify.
   EOT
 }

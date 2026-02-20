@@ -8,11 +8,11 @@ output "setup_instructions" {
   
   ✅ Google Cloud VM Created & Configuration Started!
   
-  Access Command: gcloud compute ssh openclaw-server --zone=${var.zone}
+  Cloud/Local SSH: gcloud compute ssh openclaw-server --zone=${var.zone}
   
-  ⚠️ IMPORTANT:
-  1. Wait 10-20 minutes for installation to complete.
-  2. OpenClaw is automatically configured and started with your API Key.
-  3. Check status: ssh in and run 'pm2 status'
+  ⚠️ CRITICAL:
+  1. Download 'terraform.tfstate' NOW to avoid session timeout loss.
+  2. Wait 10-20 minutes for installation to complete.
+  3. Run 'pm2 status' to verify.
   EOT
 }

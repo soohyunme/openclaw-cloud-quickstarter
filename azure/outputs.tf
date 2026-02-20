@@ -8,11 +8,12 @@ output "setup_instructions" {
   
   ✅ Azure VM Created & Configuration Started!
   
-  SSH Command: ssh ${var.admin_username}@${azurerm_linux_virtual_machine.my_terraform_vm.public_ip_address}
+  CloudShell SSH: ssh ${var.admin_username}@${azurerm_linux_virtual_machine.my_terraform_vm.public_ip_address}
+  Local PC SSH:    ssh ${var.admin_username}@${azurerm_linux_virtual_machine.my_terraform_vm.public_ip_address} (Ensure key is local)
   
-  ⚠️ IMPORTANT:
-  1. Wait 10-20 minutes for installation to complete.
-  2. OpenClaw is automatically configured and started with your API Key.
-  3. Check status: ssh in and run 'pm2 status'
+  ⚠️ CRITICAL:
+  1. Download 'terraform.tfstate' and your private key NOW to avoid session timeout loss.
+  2. Wait 10-20 minutes for installation to complete.
+  3. Run 'pm2 status' to verify.
   EOT
 }

@@ -68,16 +68,22 @@ terraform apply
 ```
 Review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
 
-### ⚠️ Crucial: Backup Your Files
-Terraform tracks your resources in `terraform.tfstate`. **If this file is lost (e.g., Cloud Shell session expires), you will lose access to manage or connect to your resources.**
+### ⚠️ CRITICAL: Cloud Shell Session Timeout
+> [!WARNING]
+> Google Cloud Shell is an **ephemeral session**. If you are idle or your browser closes, **your `terraform.tfstate` file will be PERMANENTLY LOST.**
+> 
+> **You MUST download the state file to your local PC immediately after `terraform apply`!**
 
-**To Backup:**
-1. After `terraform apply` finishes, click **Actions** (top right) -> **Download File**.
-2. Enter the path: `openclaw-cloud-quickstarter/gcp/terraform.tfstate`
-3. Save it to your local computer.
+#### 💾 How to Backup to Your Local PC:
+1.  **Download State:** In Cloud Shell, click the **three dots** (top right) -> **Download File**. 
+2.  **Path:** `openclaw-cloud-quickstarter/gcp/terraform.tfstate`
 
-**To Restore:**
-If you start a new session, upload the file back to the same folder before running any commands.
+#### 💻 How to Connect from Your Local PC (Safe Way):
+The easiest way from local PC is using the [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install):
+```bash
+gcloud compute ssh openclaw-server --zone=us-central1-a
+```
+This automatically handles your SSH keys securely.
 
 ---
 

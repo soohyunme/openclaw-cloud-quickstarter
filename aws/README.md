@@ -73,17 +73,25 @@ terraform apply
 ```
 Review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
 
-### ⚠️ Crucial: Backup Your Files
-Terraform tracks your resources in `terraform.tfstate`, and your SSH key allows access to the server. **If these files are lost (e.g., Cloud Shell session expires), you will lose access to manage or connect to your resources.**
+### ⚠️ CRITICAL: Cloud Shell Session Timeout
+> [!WARNING]
+> AWS CloudShell is an **ephemeral session**. If you are idle for 20-30 minutes, or if your browser closes, **all local files (including your SSH keys and `terraform.tfstate`) will be PERMANENTLY LOST.**
+> 
+> **You MUST download these files to your local PC immediately after `terraform apply`!**
 
-**To Backup:**
-1. After `terraform apply` finishes, click **Actions** (top right) -> **Download File**.
-2. Download both files to your local computer:
-   *   **State File:** `openclaw-cloud-quickstarter/aws/terraform.tfstate`
-   *   **Private Key:** `.ssh/id_rsa`
+#### 💾 How to Backup to Your Local PC:
+1.  **Download State:** In CloudShell, click **Actions** (top right) -> **Download File**. Path: `openclaw-cloud-quickstarter/aws/terraform.tfstate`
+2.  **Download Private Key:** Path: `/home/cloudshell-user/.ssh/id_rsa`
+3.  **Store Safely:** Keep these together in a folder on your computer.
 
-**To Restore:**
-If you start a new session, upload both files back to their respective folders before running any commands.
+#### 💻 How to Connect from Your Local PC (Safe Way):
+If CloudShell expires, you can connect from your own computer (Mac/Linux/WSL):
+1.  Move the downloaded `id_rsa` to your `~/.ssh/` folder or a safe directory.
+2.  **Set Permissions (Required):** `chmod 400 id_rsa`
+3.  **SSH Command:**
+    ```bash
+    ssh -i id_rsa ubuntu@<YOUR_EIP_IP>
+    ```
 
 ---
 
