@@ -89,7 +89,7 @@ EOF"
 
 # Start OpenClaw
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
-  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
+  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
   sudo -u $USER pm2 save
   sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
   sudo systemctl enable pm2-$USER || true

@@ -86,7 +86,8 @@ EOF"
 # Start OpenClaw Gateway as a service only if API Key is provided
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   # Use full path and handle cases where it might already be running
-  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
+  # Use full path and explicit interpreter to avoid Node.js syntax errors
+  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
   sudo -u $USER pm2 save
   # PM2 startup can be tricky in non-interactive shells; allow it to fail if already configured
   sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
