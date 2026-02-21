@@ -120,6 +120,7 @@ OpenClaw is bound to `localhost` for maximum security. To access the web interfa
     ```bash
     ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
     ```
+    *(Note: If the command fails, make sure you are in the folder where you downloaded `id_rsa`, usually your **Downloads** folder.)*
 3.  **Open your browser** and go to: `http://localhost:18789`
 4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
 
