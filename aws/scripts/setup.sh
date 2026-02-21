@@ -98,11 +98,16 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
-# Smart detection for common hubs or specific providers that need baseUrl
+# Default provider extras (empty for standard providers like OpenAI/Anthropic)
+PROVIDER_EXTRAS=""
+
+# Special Case: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
 if [[ "${LLM_API_KEY}" == nvapi-* ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
+# Special Case: Moonshot Direct API
 elif [[ "$PROVIDER" == "moonshot" ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://api.moonshot.cn/v1", "models": []'
+# Special Case: DeepSeek Direct API
 elif [[ "$PROVIDER" == "deepseek" ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
 fi
