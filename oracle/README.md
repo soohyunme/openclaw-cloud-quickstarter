@@ -99,10 +99,11 @@ Once deployment is complete (approx. 10-20 minutes), SSH into your server:
 OpenClaw is bound to `localhost` for maximum security. To access the web interface from your local computer:
 
 1.  **Open a new terminal** on your local machine.
-2.  **Run the SSH Tunnel command** (point to your private key file):
+2.  **Run the SSH Tunnel command** (point to your downloaded `id_rsa` file):
     ```bash
-    ssh -i ./your_private_key.pem -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
+    ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
     ```
+    *(Note: If the command fails, make sure you are in the folder where you downloaded `id_rsa`, usually your **Downloads** folder.)*
 3.  **Open your browser** and go to: `http://localhost:18789`
 4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
 
