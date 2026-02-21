@@ -125,6 +125,9 @@ terraform destroy
     *   Try a different Availability Domain by setting `export TF_VAR_availability_domain_number=2` (if available in your region).
     *   Try a different region or retry later.
 *   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
+*   **"Control UI requires device identity":** If you see this error in your browser, it's because you're using HTTP.
+    *   **Fix 1 (CLI Approval):** On your server, run `openclaw devices list`, copy the Request ID, and run `openclaw devices approve <ID>`. Reconnect.
+    *   **Fix 2 (SSH Tunnel):** Run `ssh -L 18789:localhost:18789 ubuntu@<IP>` on your local PC and open `http://localhost:18789`.
 
 ---
 **Enjoy your personal AI Agent! 🦞**

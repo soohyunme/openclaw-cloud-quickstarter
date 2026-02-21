@@ -140,10 +140,13 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
   LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh)"
   ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
+  HELP_TIPS="    💡 Tip: If you see 'control ui requires device identity' in browser,
+    run 'openclaw devices list' and 'openclaw devices approve <ID>' here."
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs."
   ONBOARD_INFO="    (Check ~/check-progress.sh for details)"
+  HELP_TIPS="    Action: Edit ~/.openclaw/openclaw.json then 'pm2 start openclaw'"
 fi
 
 # 6. Firewall
@@ -159,6 +162,7 @@ echo -e "=============================================================" | sudo t
 echo -e "$${STATUS_LINE}" | sudo tee -a /etc/motd
 echo -e "$${LOG_INFO}" | sudo tee -a /etc/motd
 echo -e "$${ONBOARD_INFO}" | sudo tee -a /etc/motd
+echo -e "$${HELP_TIPS}" | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
 
 echo "--- Setup Completed at $(date) ---"

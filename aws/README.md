@@ -138,8 +138,10 @@ terraform destroy
 ```
 
 ## ⚠️ Troubleshooting
-*   **Installation is slow:** On low-RAM instances (1GB), OpenClaw is built from source using a swap file. This can take 10-20 minutes. Please be patient.
 *   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
+*   **"Control UI requires device identity":** If you see this error in your browser, it's because you're using HTTP (not HTTPS).
+    *   **Fix 1 (CLI Approval):** On your server, run `openclaw devices list`, copy the Request ID, and run `openclaw devices approve <ID>`. Reconnect.
+    *   **Fix 2 (SSH Tunnel):** Run `ssh -L 18789:localhost:18789 ubuntu@<IP>` on your local PC and open `http://localhost:18789`.
 
 ## 📝 Notes on Free Tier
 *   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.
