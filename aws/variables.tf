@@ -16,7 +16,7 @@ variable "instance_type" {
 
 variable "disk_size_gb" {
   description = "Root volume size in GB (up to 30GB is free tier eligible)"
-  default     = 20
+  default     = 30
 }
 
 variable "disk_type" {
