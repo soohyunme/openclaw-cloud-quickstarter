@@ -142,7 +142,7 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
   HELP_TIPS="    💡 Security: Web UI is bound to localhost for safety.
     🔗 Access: Run this on your PC to connect:
-       ssh -L 18789:localhost:18789 ubuntu@$(curl -s ifconfig.me)"
+       ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@$(curl -s ifconfig.me)"
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs, then start manually."
