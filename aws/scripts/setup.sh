@@ -144,20 +144,39 @@ sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
 
 # Start OpenClaw Gateway as a service only if API Key is provided
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
-  # Ensure PM2 has the right environment
-  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
-  sudo -u $USER pm2 save
+  # Ensure PM2 has the right environment and retry start
+  sudo -u $USER /usr/bin/pm2 delete openclaw >/dev/null 2>&1 || true
+  sudo -u $USER /usr/bin/pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run
+  sudo -u $USER /usr/bin/pm2 save
   
+  # Wait and verify listening port
+  echo "⌛ Waiting for OpenClaw to start listening on port 18789..."
+  sleep 5
+  if ! netstat -tulnp | grep -q ":18789"; then
+      echo "⚠️ OpenClaw is NOT listening on port 18789. Checking doctor..."
+      sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive || true
+      sudo -u $USER /usr/bin/pm2 restart openclaw
+      sleep 5
+  fi
+
   # PM2 startup setup
   sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
   sudo systemctl enable pm2-$USER || true
   sudo systemctl start pm2-$USER || true
-  STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
-  LOG_INFO="    Check logs: pm2 logs openclaw"
-  ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
-  HELP_TIPS="    💡 Security: Web UI is bound to localhost for safety.
+  
+  if netstat -tulnp | grep -q ":18789"; then
+      STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
+      LOG_INFO="    Check logs: pm2 logs openclaw"
+      ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
+      HELP_TIPS="    💡 Security: Web UI is bound to localhost for safety.
     🔗 Access: Run this on your PC to connect:
        ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@$(curl -s ifconfig.me)"
+  else
+      STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
+      LOG_INFO="    Run: pm2 logs openclaw --lines 50"
+      ONBOARD_INFO="    Try: openclaw doctor --fix"
+      HELP_TIPS="    Common Cause: Invalid API Key or Config Issue."
+  fi
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs, then start manually."
