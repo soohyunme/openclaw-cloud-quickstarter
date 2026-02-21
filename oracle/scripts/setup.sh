@@ -80,6 +80,10 @@ sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "c
 # 4b. Ensure command is globally accessible immediately
 sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
 
+# 4c. Cleanup to save disk space
+sudo -u $USER bash -c "export PATH=\$PATH:/home/$USER/.local/share/pnpm; pnpm store prune" || true
+sudo apt-get clean
+
 # 5. Configure OpenClaw
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
