@@ -110,6 +110,10 @@ elif [[ "$PROVIDER" == "deepseek" ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
 fi
 
+# Generate a unique gateway token for this instance
+# This ensures Zero-Touch login via the MOTD link
+GATEWAY_TOKEN=$(openssl rand -hex 16)
+
 # Create openclaw.json using tee (loopback binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
@@ -117,7 +121,8 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
     "mode": "local",
     "bind": "loopback",
     "auth": {
-      "mode": "none"
+      "mode": "token",
+      "token": "$GATEWAY_TOKEN"
     }
   },
   "models": {
@@ -166,9 +171,9 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
       STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
       LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh)"
       ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
-      HELP_TIPS="    💡 Security: Web UI is bound to localhost for safety.
-    🔗 Access: Run this on your PC to connect:
-       ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@$(curl -s ifconfig.me)"
+      HELP_TIPS="    💡 Security: Web UI is bound to localhost with a secure token.
+    🔗 Access: Click this link (Requires SSH Tunnel):
+       http://localhost:18789/#token=$GATEWAY_TOKEN"
   else
       STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
       LOG_INFO="    Run: pm2 logs openclaw --lines 50"
