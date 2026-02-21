@@ -18,10 +18,10 @@ The following ports are automatically opened for your convenience:
 
 | Port | Protocol | Service | Description |
 | :--- | :---: | :--- | :--- |
-| **22** | SSH | System Access | Secure Shell access |
-| **18789** | TCP | **OpenClaw** | Gateway WebSocket |
+| **22** | SSH | System Access | Secure Shell access (Mandatory) |
 
-> **Note:** Ports 80, 443, 8080 (Web IDE), and 3000 are NOT opened by default to minimize attack surface.
+> [!IMPORTANT]
+> **Secure by Default**: Port 18789 (OpenClaw Gateway) is **NOT** opened to the public internet. Access is restricted to `localhost` and is securely accessed via **SSH Tunneling**.
 
 ## 🎯 Why use this?
 - **Zero Config:** Automatically installs Node.js, OpenClaw, and dependencies.
