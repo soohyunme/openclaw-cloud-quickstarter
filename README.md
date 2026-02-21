@@ -21,7 +21,7 @@ The following ports are automatically opened for your convenience:
 | **22** | SSH | System Access | Secure Shell access (Mandatory) |
 
 > [!IMPORTANT]
-> **Secure by Default**: Port 18789 (OpenClaw Gateway) is **NOT** opened to the public internet. Access is restricted to `localhost` and is securely accessed via **SSH Tunneling**.
+> **Secure by Default**: Access to the OpenClaw Gateway (18789) is restricted to `localhost` and must be accessed via **SSH Tunneling**. This keeps your agent hidden from the public internet.
 
 ## 🎯 Why use this?
 - **Zero Config:** Automatically installs Node.js, OpenClaw, and dependencies.
@@ -37,7 +37,8 @@ Choose your preferred cloud provider from the table above and follow the guide!
 1. Go to the **[Oracle Quickstart Guide](./oracle)**.
 2. Launch Cloud Shell.
 3. Run `terraform apply` and type **yes** when prompted.
-4. Enjoy your free 4 OCPU / 24GB RAM agent!
+4. **Access UI**: Run the SSH Tunnel command shown in your terminal.
+5. Enjoy your free 4 OCPU / 24GB RAM agent!
 
 ---
 **Contributions are welcome!** Feel free to submit a PR for other cloud providers.
