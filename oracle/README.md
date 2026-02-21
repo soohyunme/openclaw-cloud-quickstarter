@@ -133,8 +133,15 @@ terraform destroy
 *   **pm2 command not found:** If the installation just finished, refresh your environment: `source ~/.bashrc`.
 *   **"Control UI requires device identity" or "device token mismatch":**
     1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
-    2.  Clear your browser's local storage/cookies for `localhost:18789` (History -> Clear browsing data). This happens when a previous installation's token stays in your browser.
-    3.  Refresh the page.
+    2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.
+    3.  Alternatively, run this on the server to get a fresh login URL:
+        ```bash
+        openclaw dashboard --no-open
+        ```
+    4.  If it still asks for a token, you can generate one manually on the server:
+        ```bash
+        openclaw doctor --generate-gateway-token
+        ```
 
 ---
 **Enjoy your personal AI Agent! 🦞**
