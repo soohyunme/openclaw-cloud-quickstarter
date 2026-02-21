@@ -9,9 +9,7 @@ This repository provides **one-click deployment templates** (Terraform) to set u
 | Cloud Provider | Cost (Free Tier) | Specs | Guide |
 | :--- | :--- | :--- | :---: |
 | **[Oracle Cloud](./oracle)** | **Lifetime Free** | 4 vCPU / 24GB RAM | [📖 Start Guide](./oracle) |
-| **[Google Cloud](./gcp)** | **Lifetime Free** | 2 vCPU / 1GB RAM | [📖 Start Guide](./gcp) |
 | **[AWS](./aws)** | 12 Months Free | 2 vCPU / 1GB RAM | [📖 Start Guide](./aws) |
-| **[Azure](./azure)** | 12 Months Free | 1 vCPU / 1GB RAM | [📖 Start Guide](./azure) |
 
 ---
 
