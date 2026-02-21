@@ -95,14 +95,13 @@ else
   export PROVIDER="anthropic"
   export MODEL="${OPENCLAW_MODEL}"
 fi
-PROVIDER_EXTRAS=""
 
-# Create openclaw.json using tee (Loopback binding for SSH Tunneling security)
+# Create openclaw.json using tee (127.0.0.1 binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
     "mode": "local",
-    "bind": "loopback",
+    "bind": "127.0.0.1",
     "auth": {
       "mode": "none"
     }
