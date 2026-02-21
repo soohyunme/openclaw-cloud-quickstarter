@@ -42,7 +42,7 @@ By default, this template provisions:
 - **Compute:** `t3.micro` (2 vCPU, 1GB RAM) - Universal Free Tier.
 - **Fixed IP:** Elastic IP (EIP) attached to the instance.
 - **Network:** Dedicated VPC with a public subnet and Internet Gateway.
-- **Security:** Security Group rules for SSH (22). **Port 18789 is CLOSED** for security.
+- **Security:** Security Group rules for SSH (22). **Access to OpenClaw (18789) is restricted via SSH Tunneling.**
 - **Automation:** User Data script to install Node.js, PM2, and OpenClaw bound to localhost.
 
 ### 4. Configuration

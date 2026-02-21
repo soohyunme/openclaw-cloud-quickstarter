@@ -27,7 +27,7 @@ cd openclaw-cloud-quickstarter/oracle
 By default, this template provisions:
 - **Compute:** `VM.Standard.A1.Flex` (4 OCPU, 24GB RAM) - Always Free.
 - **Network:** Virtual Cloud Network (VCN) with a Public Subnet.
-- **Security:** Ingress rules for SSH (22). **Port 18789 is CLOSED** for security.
+- **Security:** Ingress rules for SSH (22). **Access to OpenClaw (18789) is restricted via SSH Tunneling.**
 - **Automation:** Automated installation of Node.js, PM2, and OpenClaw bound to localhost.
 
 ### 3. Configuration
