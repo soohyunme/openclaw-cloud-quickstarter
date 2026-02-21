@@ -93,56 +93,61 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
-# Create openclaw.json with the latest schema (2026.2.x)
-sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
+# Pre-calculate Token and Provider-Specific Configuration
+export GATEWAY_TOKEN="openclaw-token-$(openssl rand -hex 16)"
+export PROVIDER_EXTRAS=""
+if [[ "$PROVIDER" == "moonshot" ]]; then
+    export PROVIDER_EXTRAS=", \"baseUrl\": \"https://api.moonshot.cn/v1\", \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]"
+fi
+
+# Create openclaw.json using tee to avoid complex shell escaping within sudo bash -c
+cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
-  \"gateway\": {
-    \"mode\": \"local\",
-    \"bind\": \"auto\",
-    \"auth\": {
-      \"mode\": \"token\",
-      \"token\": \"openclaw-token-\$$(openssl rand -hex 16)\"
+  "gateway": {
+    "mode": "local",
+    "bind": "auto",
+    "auth": {
+      "mode": "token",
+      "token": "$GATEWAY_TOKEN"
     }
   },
-  \"models\": {
-    \"providers\": {
-      \"$${PROVIDER}\": {
-        \"apiKey\": \"${LLM_API_KEY}\"$( [[ "$${PROVIDER}" == "moonshot" ]] && echo ",
-        \"baseUrl\": \"https://api.moonshot.cn/v1\",
-        \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]" )
+  "models": {
+    "providers": {
+      "$PROVIDER": {
+        "apiKey": "${LLM_API_KEY}"$PROVIDER_EXTRAS
       }
     }
   },
-  \"agents\": {
-    \"defaults\": {
-      \"model\": {
-        \"primary\": \"$${PROVIDER}/$${MODEL}\"
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "$PROVIDER/$MODEL"
       }
     }
   }
 }
-EOF"
+EOF
 
 # Automatically fix/fill provider-specific configuration (important for Moonshot/Gemini)
 sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
 
 # Start OpenClaw Gateway as a service only if API Key is provided
 if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
-  # Use full path and handle cases where it might already be running
-  # Use full path and explicit interpreter to avoid Node.js syntax errors
+  # Ensure PM2 has the right environment
   sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
   sudo -u $USER pm2 save
-  # PM2 startup can be tricky in non-interactive shells; allow it to fail if already configured
+  
+  # PM2 startup setup
   sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
   sudo systemctl enable pm2-$USER || true
   sudo systemctl start pm2-$USER || true
   STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
-  LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh for setup history)"
+  LOG_INFO="    Check logs: pm2 logs openclaw"
   ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs, then start manually."
-  ONBOARD_INFO="    (Check ~/check-progress.sh for details)"
+  ONBOARD_INFO="    (LLM_API_KEY was not set during deployment)"
 fi
 
 # 6. Configure Firewall
