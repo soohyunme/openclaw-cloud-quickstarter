@@ -93,8 +93,7 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
-# Pre-calculate Token and Provider-Specific Configuration
-export GATEWAY_TOKEN="openclaw-token-$(openssl rand -hex 16)"
+# Pre-calculate Provider-Specific Configuration
 export PROVIDER_EXTRAS=""
 if [[ "$PROVIDER" == "moonshot" ]]; then
     export PROVIDER_EXTRAS=", \"baseUrl\": \"https://api.moonshot.cn/v1\", \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]"
@@ -105,10 +104,9 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
     "mode": "local",
-    "bind": "auto",
+    "bind": "0.0.0.0",
     "auth": {
-      "mode": "token",
-      "token": "$GATEWAY_TOKEN"
+      "mode": "none"
     }
   },
   "models": {

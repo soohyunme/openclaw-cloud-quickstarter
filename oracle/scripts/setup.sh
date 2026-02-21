@@ -92,34 +92,38 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
-sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
+# Pre-calculate Provider-Specific Configuration
+export PROVIDER_EXTRAS=""
+if [[ "$PROVIDER" == "moonshot" ]]; then
+    export PROVIDER_EXTRAS=", \"baseUrl\": \"https://api.moonshot.cn/v1\", \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]"
+fi
+
+# Create openclaw.json using tee to avoid complex shell escaping within sudo bash -c
+cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
-  \"gateway\": {
-    \"mode\": \"local\",
-    \"bind\": \"auto\",
-    \"auth\": {
-      \"mode\": \"token\",
-      \"token\": \"openclaw-token-\$$(openssl rand -hex 16)\"
+  "gateway": {
+    "mode": "local",
+    "bind": "0.0.0.0",
+    "auth": {
+      "mode": "none"
     }
   },
-  \"models\": {
-    \"providers\": {
-      \"$${PROVIDER}\": {
-        \"apiKey\": \"${LLM_API_KEY}\"$( [[ "$${PROVIDER}" == "moonshot" ]] && echo ",
-        \"baseUrl\": \"https://api.moonshot.cn/v1\",
-        \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]" )
+  "models": {
+    "providers": {
+      "$PROVIDER": {
+        "apiKey": "${LLM_API_KEY}"$PROVIDER_EXTRAS
       }
     }
   },
-  \"agents\": {
-    \"defaults\": {
-      \"model\": {
-        \"primary\": \"$${PROVIDER}/$${MODEL}\"
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "$PROVIDER/$MODEL"
       }
     }
   }
 }
-EOF"
+EOF
 
 # Automatically fix/fill provider-specific configuration
 sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
