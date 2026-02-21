@@ -27,8 +27,8 @@ cd openclaw-cloud-quickstarter/oracle
 By default, this template provisions:
 - **Compute:** `VM.Standard.A1.Flex` (4 OCPU, 24GB RAM) - Always Free.
 - **Network:** Virtual Cloud Network (VCN) with a Public Subnet.
-- **Security:** Ingress rules for SSH (22) and OpenClaw Gateway (18789).
-- **Automation:** Automated installation of Node.js, PM2, and OpenClaw.
+- **Security:** Ingress rules for SSH (22). **Port 18789 is CLOSED** for security.
+- **Automation:** Automated installation of Node.js, PM2, and OpenClaw bound to localhost.
 
 ### 3. Configuration
 Set your variables using `export` (simplest for Cloud Shell):
@@ -95,15 +95,22 @@ Once deployment is complete (approx. 10-20 minutes), SSH into your server:
 
 ## 🎉 Finalizing Setup
 
+### 🪄 Access the Web UI (Securely)
+OpenClaw is bound to `localhost` for maximum security. To access the web interface from your local computer:
+
+1.  **Open a new terminal** on your local machine.
+2.  **Run the SSH Tunnel command**:
+    ```bash
+    ssh -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
+    ```
+3.  **Open your browser** and go to: `http://localhost:18789`
+4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
+
 ### 🪄 The Onboarding Wizard
-To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:
+Connect messaging channels (Discord/Telegram), or change your persona:
 ```bash
 openclaw onboard
 ```
-**This wizard will help you:**
-*   **Auth:** Link Gemini (Google Antigravity) or GitHub Copilot (Codex).
-*   **Channels:** Connect to WhatsApp, Telegram, Discord, etc.
-*   **Persona:** Change your agent's name and personality.
 
 ### 📊 Check Status
 ```bash
@@ -121,13 +128,9 @@ terraform destroy
 ```
 
 ## ⚠️ Troubleshooting
-*   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock.
-    *   Try a different Availability Domain by setting `export TF_VAR_availability_domain_number=2` (if available in your region).
-    *   Try a different region or retry later.
-*   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
-*   **"Control UI requires device identity":** If you see this error in your browser, it's because you're using HTTP.
-    *   **Fix 1 (CLI Approval):** On your server, run `openclaw devices list`, copy the Request ID, and run `openclaw devices approve <ID>`. Reconnect.
-    *   **Fix 2 (SSH Tunnel):** Run `ssh -L 18789:localhost:18789 ubuntu@<IP>` on your local PC and open `http://localhost:18789`.
+*   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain.
+*   **pm2 command not found:** If the installation just finished, refresh your environment: `source ~/.bashrc`.
+*   **"Control UI requires device identity":** If you see this, ensure you are using the **SSH Tunnel** (Method 2) and accessing via `http://localhost:18789`.
 
 ---
 **Enjoy your personal AI Agent! 🦞**

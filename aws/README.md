@@ -42,8 +42,8 @@ By default, this template provisions:
 - **Compute:** `t3.micro` (2 vCPU, 1GB RAM) - Universal Free Tier.
 - **Fixed IP:** Elastic IP (EIP) attached to the instance.
 - **Network:** Dedicated VPC with a public subnet and Internet Gateway.
-- **Security:** Security Group rules for SSH (22) and OpenClaw Gateway (18789).
-- **Automation:** User Data script to install Node.js, PM2, and OpenClaw.
+- **Security:** Security Group rules for SSH (22). **Port 18789 is CLOSED** for security.
+- **Automation:** User Data script to install Node.js, PM2, and OpenClaw bound to localhost.
 
 ### 4. Configuration
 Set your variables using `export` (simplest for CloudShell):
@@ -112,15 +112,22 @@ Once deployment is complete (approx. 15-20 minutes), SSH into your server:
     pm2 status
     ```
 
+### 🪄 Access the Web UI (Securely)
+OpenClaw is bound to `localhost` for maximum security. To access the web interface from your local computer:
+
+1.  **Open a new terminal** on your local machine.
+2.  **Run the SSH Tunnel command**:
+    ```bash
+    ssh -i ~/.ssh/id_rsa -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
+    ```
+3.  **Open your browser** and go to: `http://localhost:18789`
+4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
+
 ### 🪄 The Onboarding Wizard
-To complete your setup, connect messaging channels (Discord/Telegram), or use other login methods (Gemini/Codex), run the **Onboarding Wizard**:
+Connect messaging channels (Discord/Telegram), or change your persona:
 ```bash
 openclaw onboard
 ```
-**This wizard will help you:**
-*   **Auth:** Link Gemini (Google Antigravity) or GitHub Copilot (Codex).
-*   **Channels:** Connect to WhatsApp, Telegram, Discord, etc.
-*   **Persona:** Change your agent's name and personality.
 
 ### 📊 Check Status
 ```bash
@@ -138,10 +145,8 @@ terraform destroy
 ```
 
 ## ⚠️ Troubleshooting
-*   **pm2 command not found:** If the installation just finished, you might need to exit the SSH session and reconnect to refresh your environment variables.
-*   **"Control UI requires device identity":** If you see this error in your browser, it's because you're using HTTP (not HTTPS).
-    *   **Fix 1 (CLI Approval):** On your server, run `openclaw devices list`, copy the Request ID, and run `openclaw devices approve <ID>`. Reconnect.
-    *   **Fix 2 (SSH Tunnel):** Run `ssh -L 18789:localhost:18789 ubuntu@<IP>` on your local PC and open `http://localhost:18789`.
+*   **pm2 command not found:** If the installation just finished, you might need to refresh your environment: `source ~/.bashrc`.
+*   **"Control UI requires device identity":** If you see this, ensure you are using the **SSH Tunnel** (Method 2) and accessing via `http://localhost:18789`.
 
 ## 📝 Notes on Free Tier
 *   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.

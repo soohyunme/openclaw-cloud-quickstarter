@@ -92,22 +92,14 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
-# Pre-calculate Token and Provider-Specific Configuration
-export GATEWAY_TOKEN="openclaw-token-$(openssl rand -hex 16)"
-export PROVIDER_EXTRAS=""
-if [[ "$PROVIDER" == "moonshot" ]]; then
-    export PROVIDER_EXTRAS=", \"baseUrl\": \"https://api.moonshot.cn/v1\", \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]"
-fi
-
-# Create openclaw.json using tee to avoid complex shell escaping within sudo bash -c
+# Create openclaw.json using tee (Loopback binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
     "mode": "local",
-    "bind": "lan",
+    "bind": "loopback",
     "auth": {
-      "mode": "token",
-      "token": "$GATEWAY_TOKEN"
+      "mode": "none"
     }
   },
   "models": {
@@ -140,8 +132,9 @@ if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
   STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
   LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh)"
   ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
-  HELP_TIPS="    💡 Tip: If you see 'control ui requires device identity' in browser,
-    run 'openclaw devices list' and 'openclaw devices approve <ID>' here."
+  HELP_TIPS="    💡 Security: Web UI is bound to localhost for safety.
+    🔗 Access: Run this on your PC to connect:
+       ssh -L 18789:localhost:18789 ubuntu@$(curl -s ifconfig.me)"
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs."
@@ -149,8 +142,12 @@ else
   HELP_TIPS="    Action: Edit ~/.openclaw/openclaw.json then 'pm2 start openclaw'"
 fi
 
-# 6. Firewall
-sudo iptables -A INPUT -p tcp --dport 18789 -j ACCEPT
+# 6. Firewall (SSH only, Gateway via Tunnel)
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent netfilter-persistent
 sudo netfilter-persistent save
 

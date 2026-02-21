@@ -24,10 +24,6 @@ variable "disk_type" {
   default     = "gp2"
 }
 
-variable "gateway_cidr" {
-  description = "CIDR block allowed to access OpenClaw Gateway (port 18789). Default is open to world (0.0.0.0/0)."
-  default     = "0.0.0.0/0"
-}
 
 variable "public_key_path" {
   description = "Path to the local public key file to upload to AWS"
