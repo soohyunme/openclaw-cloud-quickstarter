@@ -96,12 +96,21 @@ else
   export MODEL="${OPENCLAW_MODEL}"
 fi
 
+# Smart detection for common hubs or specific providers that need baseUrl
+if [[ "${LLM_API_KEY}" == nvapi-* ]]; then
+  PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
+elif [[ "$PROVIDER" == "moonshot" ]]; then
+  PROVIDER_EXTRAS=', "baseUrl": "https://api.moonshot.cn/v1", "models": []'
+elif [[ "$PROVIDER" == "deepseek" ]]; then
+  PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
+fi
+
 # Create openclaw.json using tee (127.0.0.1 binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
     "mode": "local",
-    "bind": "127.0.0.1",
+    "bind": "loopback",
     "auth": {
       "mode": "none"
     }
