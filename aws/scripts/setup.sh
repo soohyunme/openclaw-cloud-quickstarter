@@ -104,7 +104,7 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
     "mode": "local",
-    "bind": "0.0.0.0",
+    "bind": "lan",
     "auth": {
       "mode": "none"
     }
