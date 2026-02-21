@@ -147,7 +147,10 @@ terraform destroy
 
 ## ⚠️ Troubleshooting
 *   **pm2 command not found:** If the installation just finished, you might need to refresh your environment: `source ~/.bashrc`.
-*   **"Control UI requires device identity":** If you see this, ensure you are using the **SSH Tunnel** (Method 2) and accessing via `http://localhost:18789`.
+*   **"Control UI requires device identity" or "device token mismatch":**
+    1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
+    2.  Clear your browser's local storage/cookies for `localhost:18789` (History -> Clear browsing data). This happens when a previous installation's token stays in your browser.
+    3.  Refresh the page.
 
 ## 📝 Notes on Free Tier
 *   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.

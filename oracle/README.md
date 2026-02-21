@@ -131,7 +131,10 @@ terraform destroy
 ## ⚠️ Troubleshooting
 *   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain.
 *   **pm2 command not found:** If the installation just finished, refresh your environment: `source ~/.bashrc`.
-*   **"Control UI requires device identity":** If you see this, ensure you are using the **SSH Tunnel** (Method 2) and accessing via `http://localhost:18789`.
+*   **"Control UI requires device identity" or "device token mismatch":**
+    1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
+    2.  Clear your browser's local storage/cookies for `localhost:18789` (History -> Clear browsing data). This happens when a previous installation's token stays in your browser.
+    3.  Refresh the page.
 
 ---
 **Enjoy your personal AI Agent! 🦞**
