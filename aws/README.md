@@ -154,7 +154,8 @@ terraform destroy
         ```bash
         openclaw dashboard --no-open
         ```
-    4.  If it still asks for a token, you can generate one manually on the server:
+    4.  **Copy the FULL URL** (e.g., `http://localhost:18789/#token=...`) and paste it into your browser. This bypasses the session conflict.
+    5.  If it still asks for a token, you can generate one manually on the server:
         ```bash
         openclaw doctor --generate-gateway-token
         ```
