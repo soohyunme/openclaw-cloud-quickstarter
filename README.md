@@ -8,7 +8,7 @@ This repository provides **one-click deployment templates** (Terraform) to set u
 
 | Cloud Provider | Cost (Free Tier) | Specs | Guide |
 | :--- | :--- | :--- | :---: |
-| **[Oracle Cloud](https://cloud.oracle.com/)** | **Lifetime Free** | 4 OCPU / 24GB RAM | [📖 Start Guide](./oracle) |
+| **[Oracle Cloud](https://cloud.oracle.com/)** | **Lifetime Free** | 4 OCPU / 24GB RAM | [⚠️ (Coming Soon)](./oracle) |
 | **[AWS](https://console.aws.amazon.com/)** | Free Tier Eligible | t3.small / 2GB RAM | [📖 Start Guide](./aws) |
 
 > [!NOTE]
@@ -36,7 +36,7 @@ The following ports are automatically opened for your convenience:
 ## 🚀 Getting Started
 Choose your preferred cloud provider from the table above and follow the guide!
 
-### Example: Oracle Cloud (Recommended for Free Tier)
+### Example: Oracle Cloud (Recommended - Coming Soon 🚧)
 1. Go to the **[Oracle Quickstart Guide](./oracle)**.
 2. Launch Cloud Shell.
 3. Run `terraform apply` and type **yes** when prompted.
