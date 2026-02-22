@@ -36,9 +36,12 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
 4.  **Deploy! 🏗️**
     ```bash
     terraform init
-    terraform plan    # Recommended: Review what will be created
-    terraform apply -auto-approve
+    terraform apply
     ```
+    Type **yes** when prompted.
+
+> [!TIP]
+> To skip the confirmation prompt, you can use `terraform apply -auto-approve`.
 5.  **📥 DOWNLOAD CRITICAL FILES NOW!**
     Use the Cloud Shell **"Actions" > "Download File"** menu (top right) to save these to your local PC:
     - `.ssh/id_rsa` (If you generated a key) or your private key file
