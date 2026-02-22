@@ -88,23 +88,20 @@ Now that the instance is running, you can move to your local computer's terminal
     ./check-progress.sh
     ```
 
-5.  **Access the Dashboard:**
-    Once progress reaches 100%, **copy the full access link (including the #token=... part)** shown in your terminal and paste it into your browser:
-    `http://localhost:18789/#token=...`
+    While the installation runs, notice that your **Dynamic MOTD** is already being prepared. Once complete, you can access the dashboard using the full link (with token) shown in the terminal.
 
 ---
 
-## 📊 Management & Monitoring
+## 📊 Management & Onboarding
 
-### 🪄 The Onboarding Wizard (Advanced Setup)
-
-Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session (the terminal from Phase 2):
+### 🪄 The Onboarding Wizard
+Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session:
 
 ```bash
 openclaw onboard
 ```
 > [!TIP]
-> If the command is not found, run `source ~/.bashrc` first or use the full path: `~/.local/bin/openclaw onboard`.
+> **Lost your token?** Simply log in again! The **Dynamic MOTD** will show your live dashboard link and token on every login.
 
 ---
 

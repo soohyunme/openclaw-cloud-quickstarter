@@ -163,27 +163,37 @@ cat <<'DYN_MOTD' | sudo tee /etc/update-motd.d/99-openclaw > /dev/null
 USER="ubuntu"
 CONFIG="/home/$USER/.openclaw/openclaw.json"
 
+# Use full paths for reliability in MOTD context
+GREP="/usr/bin/grep"
+CUT="/usr/bin/cut"
+SS="/usr/bin/ss"
+
 echo "============================================================="
 echo " 🦞 Welcome to Your OpenClaw Server! "
 echo "============================================================="
 
 if [ -f "$CONFIG" ]; then
-    TOKEN=$(grep '"token":' "$CONFIG" | cut -d'"' -f4)
-    if netstat -tulnp | grep -q ":18789"; then
+    TOKEN=$($GREP '"token":' "$CONFIG" | $CUT -d'"' -f4)
+    # Check if gateway is listening on 18789
+    if $SS -tuln | $GREP -q ":18789"; then
         echo " ✅ OpenClaw Platform is READY"
         echo "    Join Dashboard: http://localhost:18789/#token=$TOKEN"
         echo "    👉 Run 'openclaw onboard' to set up your AI models!"
     else
         echo " ❌ ERROR: OpenClaw is NOT listening on port 18789"
         echo "    Run: pm2 logs openclaw --lines 50"
+        echo "    Or: openclaw gateway restart"
     fi
 else
     echo " ⚠️ OpenClaw configuration not found at $CONFIG"
+    echo "    Did you finish the installation?"
 fi
 echo "============================================================="
 DYN_MOTD
 sudo chmod +x /etc/update-motd.d/99-openclaw
-# Remove any static MOTD appends to keep it clean
+# Force update the dynamic MOTD cache
+sudo run-parts /etc/update-motd.d/ > /run/motd.dynamic || true
+# Clear static MOTD
 sudo truncate -s 0 /etc/motd || true
 
 echo "--- Setup Completed at $(date) ---"
