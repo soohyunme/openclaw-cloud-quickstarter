@@ -104,82 +104,10 @@ sudo apt-get clean
 
 # 5. Configure OpenClaw (Fully Automated)
 sudo -u $USER mkdir -p /home/$USER/.openclaw
+# --- Platform and Gateway Configuration ---
 
-# Parse Provider and Model
-if [[ "$LLM_API_KEY" == nvapi-* ]]; then
-  # For NVIDIA NIM, force provider to 'nvidia' but keep full model ID
-  export PROVIDER="nvidia"
-  export MODEL="$OPENCLAW_MODEL"
-elif [[ "$OPENCLAW_MODEL" == *"/"* ]]; then
-  # Standard format: provider/model
-  export PROVIDER=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f1)
-  export MODEL=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f2-)
-else
-  # Default to Anthropic
-  export PROVIDER="anthropic"
-  export MODEL="$OPENCLAW_MODEL"
-fi
-
-# --- Provider and Model Refinement ---
-
-if [[ "$LLM_API_KEY" == "none" ]]; then
-  # Exploration Mode: Omit models/agents config to let 'onboard' handle everything
-  MODELS_CONFIG=""
-else
-  # Case 1: Anthropic
-  if [[ "$PROVIDER" == "anthropic" ]]; then
-    export MODEL="$OPENCLAW_MODEL"
-    PROVIDER_EXTRAS=', "api": "anthropic-messages", "baseUrl": "https://api.anthropic.com", "models": []'
-
-  # Case 2: OpenAI
-  elif [[ "$PROVIDER" == "openai" ]]; then
-    export MODEL="$OPENCLAW_MODEL"
-    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.openai.com/v1", "models": []'
-
-  # Case 3: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
-  elif [[ "$LLM_API_KEY" == nvapi-* ]]; then
-    export PROVIDER="nvidia"
-    if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
-      export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
-    else
-      export MODEL="$OPENCLAW_MODEL"
-    fi
-    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
-
-  # Case 4: Moonshot Direct API
-  elif [[ "$PROVIDER" == "moonshot" ]]; then
-    export MODEL="$OPENCLAW_MODEL"
-    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.moonshot.cn/v1", "models": []'
-
-  # Case 5: DeepSeek Direct API
-  elif [[ "$PROVIDER" == "deepseek" ]]; then
-    export MODEL="$OPENCLAW_MODEL"
-    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.deepseek.com", "models": []'
-
-  # Case 6: Other providers
-  else
-    export MODEL="$OPENCLAW_MODEL"
-    PROVIDER_EXTRAS=""
-  fi
-
-  # Build the models and agents configuration string
-  MODELS_CONFIG=",
-  \"models\": {
-    \"providers\": {
-      \"$PROVIDER\": {
-        \"apiKey\": \"$LLM_API_KEY\"$PROVIDER_EXTRAS
-      }
-    }
-  },
-  \"agents\": {
-    \"defaults\": {
-      \"model\": {
-        \"primary\": \"$PROVIDER/$MODEL\"
-      }
-    }
-  }"
-fi
-
+# We only configure the Gateway access (Authentication) here.
+# LLM Provider configuration is delegated to 'openclaw onboard' for maximum reliability.
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
@@ -189,7 +117,7 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
       "mode": "token",
       "token": "$GATEWAY_TOKEN"
     }
-  }$MODELS_CONFIG
+  }
 }
 EOF
 

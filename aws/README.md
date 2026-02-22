@@ -31,13 +31,9 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
     ```bash
     ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
     ```
-5.  **Set your variables:**
+5.  **Set your region:**
     ```bash
     export TF_VAR_aws_region=$AWS_REGION
-    export TF_VAR_llm_api_key="your-api-key-here" # Use "none" to explore without a key
-
-    # (Optional) Change AI model. Default: claude-3-5-sonnet-20241022
-    # export TF_VAR_openclaw_model="openai/gpt-4o"
     ```
 6.  **Deploy! 🏗️**
     ```bash
@@ -106,6 +102,27 @@ openclaw onboard
 > If the command is not found, run `source ~/.bashrc` first or use the full path: `~/.local/bin/openclaw onboard`.
 
 ---
+
+### 🔵 Phase 2: Finish Setup (Onboarding)
+
+Once infrastructure is deployed, you must run the official onboarding wizard to configure your AI models.
+
+1.  **Connect to your instance:**
+    (Use the SSH command provided in the Terraform output)
+2.  **Monitor installation:**
+    ```bash
+    ./check-progress.sh
+    ```
+3.  **Run Onboarding Wizard:**
+    When setup is complete, run:
+    ```bash
+    openclaw onboard
+    ```
+    Follow the prompts to add your API keys (Anthropic, OpenAI, etc.). OpenClaw will handle the rest!
+
+---
+
+## 🛠️ Advanced Options
 
 ### 🧹 Clean Up (Destroy)
 To remove all resources and stop billing (if any):
