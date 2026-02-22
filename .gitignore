@@ -20,9 +20,3 @@ logs/
 *.swp
 *~
 *.DS_Store
-
-AGENTS.md
-ROADMAP.md
-SOUL.md
-TODO.md
-MEMORY.md
