@@ -87,11 +87,15 @@ Now that the instance is up, you can move to your local computer's terminal (Mac
 
 ## 📊 Management & Monitoring
 
-### 🪄 The Onboarding Wizard
-Connect messaging channels (Discord/Telegram), or change your persona:
+### 🪄 The Onboarding Wizard (Advanced Setup)
+
+Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session (the terminal from Phase 2):
+
 ```bash
 openclaw onboard
 ```
+> [!TIP]
+> If the command is not found, run `source ~/.bashrc` first or use the full path: `~/.local/bin/openclaw onboard`.
 
 ### 📊 Check Status
 ```bash

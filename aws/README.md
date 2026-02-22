@@ -44,6 +44,7 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
 
 > [!TIP]
 > To skip the confirmation prompt, you can use `terraform apply -auto-approve`.
+
 7.  **📥 DOWNLOAD CRITICAL FILES NOW!**
     Use the CloudShell **"Actions" > "Download File"** menu (top right) to save these to your local PC:
     - `.ssh/id_rsa` (Your private key)
@@ -54,7 +55,7 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
 
 ---
 
-### � Phase 2: On Your Local PC (Access & Monitoring)
+### 🔵 Phase 2: On Your Local PC (Access & Monitoring)
 
 Now that the instance is running, you can move to your local computer's terminal (Mac, Linux, or WSL).
 
@@ -89,6 +90,16 @@ Now that the instance is running, you can move to your local computer's terminal
 ---
 
 ## 📊 Management & Monitoring
+
+### 🪄 The Onboarding Wizard (Advanced Setup)
+
+Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session (the terminal from Phase 2):
+
+```bash
+openclaw onboard
+```
+> [!TIP]
+> If the command is not found, run `source ~/.bashrc` first or use the full path: `~/.local/bin/openclaw onboard`.
 
 ---
 
