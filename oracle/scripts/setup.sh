@@ -9,6 +9,9 @@ PROVIDER_EXTRAS=""
 OPENCLAW_MODEL="${OPENCLAW_MODEL}"
 LLM_API_KEY="${LLM_API_KEY}"
 
+# Generate Gateway Token early for injection
+GATEWAY_TOKEN=$(openssl rand -hex 16)
+
 # Create a progress checker
 cat <<EOF > /home/$USER/check-progress.sh
 #!/bin/bash
@@ -37,6 +40,8 @@ done
 echo -e "\n-------------------------------------------------------------"
 echo "✅ INSTALLATION COMPLETE!"
 echo "🚀 Your OpenClaw server is ready."
+echo "🔗 Access Dashboard: http://localhost:18789/#token=$GATEWAY_TOKEN"
+echo "   (Requires SSH Tunnel: ssh -L 18789:localhost:18789 ...)"
 echo "👉 Run 'openclaw onboard' to finish your setup!"
 echo "   (If 'openclaw' is not found, run 'source ~/.bashrc' or use its full path: ~/.local/bin/openclaw onboard)"
 echo "-------------------------------------------------------------"
@@ -128,10 +133,6 @@ elif [[ "$PROVIDER" == "moonshot" ]]; then
 elif [[ "$PROVIDER" == "deepseek" ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
 fi
-
-# Generate a unique gateway token for this instance
-# This ensures Zero-Touch login via the MOTD link
-GATEWAY_TOKEN=$(openssl rand -hex 16)
 
 # Create openclaw.json using tee (loopback binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null

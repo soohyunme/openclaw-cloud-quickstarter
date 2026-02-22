@@ -7,109 +7,82 @@ This Terraform template provisions a **Free Tier (Always Free)** compatible VM (
 
 ---
 
-## 🚀 Quick Start (Using Cloud Shell)
+## 🚀 Quick Start (Two-Phase Setup)
 
-The easiest way to deploy is using **OCI Cloud Shell** (a free terminal in your browser). No local installation required!
+CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Phase** approach: **Build** in the cloud, then **Control** from your local machine.
 
-### 1. Open Cloud Shell
-1.  Log in to the [Oracle Cloud Console](https://cloud.oracle.com/).
-2.  Click the **Developer Tools** icon (terminal icon `>_`) in the top-right header.
-3.  Select **Cloud Shell**.
+---
 
-### 2. Download the Code
-Run the following commands in Cloud Shell:
-```bash
-git clone https://github.com/soohyunme/openclaw-cloud-quickstarter.git
-cd openclaw-cloud-quickstarter/oracle
-```
+### 🟢 Phase 1: In OCI Cloud Shell (Infrastructure)
 
-### 🏗️ Default Infrastructure
-By default, this template provisions:
-- **Compute:** `VM.Standard.A1.Flex` (4 OCPU, 24GB RAM) - Always Free.
-- **Network:** Virtual Cloud Network (VCN) with a Public Subnet.
-- **Security:** Ingress rules for SSH (22). **Access to OpenClaw (18789) is restricted via SSH Tunneling.**
-- **Automation:** Automated installation of Node.js, PM2, and OpenClaw bound to localhost.
-
-### 3. Configuration
-Set your variables using `export` (simplest for Cloud Shell):
-
-```bash
-# 1. OCI Authentication (Get these from OCI Console)
-export TF_VAR_tenancy_ocid="ocid1.tenancy..."
-export TF_VAR_user_ocid="ocid1.user..."
-export TF_VAR_fingerprint="xx:xx:xx..."
-export TF_VAR_private_key_path="~/.oci/oci_api_key.pem"
-export TF_VAR_region="ap-seoul-1"
-export TF_VAR_compartment_ocid="ocid1.compartment..."
-export TF_VAR_ssh_public_key="ssh-rsa AAAA..."
-
-# 2. LLM API Key
-# If you don't have one yet or will use Gemini/Codex login, use "none"
-export TF_VAR_llm_api_key="sk-ant-..."
-```
-
-> **💡 Tip:** Advanced users can create a `terraform.tfvars` file using `nano` or `vim` for persistent configuration. See `terraform.tfvars.example`.
-
-### 4. Deploy! 🏗️
-Initialize Terraform and review the execution plan before applying:
-```bash
-terraform init
-terraform plan    # Recommended: Review what will be created
-terraform apply
-```
-When prompted, review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
-
-> [!TIP]
-> **For Faster Deployment:** You can use `terraform apply -auto-approve` to skip the "yes" prompt. However, it is **highly recommended** to run `terraform plan` first at least once to ensure you are not creating unexpected resources or costs.
-
-### ⚠️ CRITICAL: Cloud Shell Session Timeout
-> [!WARNING]
-> OCI Cloud Shell is an **ephemeral session**. If you are idle or your browser closes, **your `terraform.tfstate` file will be PERMANENTLY LOST.**
-> 
-> **You MUST download the state file to your local PC immediately after `terraform apply`!**
-
-#### 💾 How to Backup to Your Local PC:
-1.  **Download State:** In Cloud Shell, click **Actions** (top right) -> **Download File**. 
-2.  **Path:** `openclaw-cloud-quickstarter/oracle/terraform.tfstate`
-3.  **Private Key:** Ensure you also have the private key corresponding to the public key you provided in `TF_VAR_ssh_public_key`.
-
-#### 💻 How to Connect from Your Local PC (Safe Way):
-1.  **Set Permissions (Required):** `chmod 400 your_private_key.pem`
-2.  **SSH Command:**
+1.  **Open [Oracle Cloud Shell](https://cloud.oracle.com/)** by clicking the terminal icon (`>_`) in the top right.
+2.  **Clone this repository:**
     ```bash
-    ssh ubuntu@<YOUR_INSTANCE_IP>
+    git clone https://github.com/soohyunme/openclaw-cloud-quickstarter.git
+    cd openclaw-cloud-quickstarter/oracle
     ```
-
-Once deployment is complete (approx. 10-20 minutes), SSH into your server:
-
-1.  **Open Cloud Shell** (if not already open).
-2.  **SSH Command:**
+3.  **Set your authentication variables:**
+    *(Get these from your OCI User Settings/API Keys page)*
     ```bash
-    ssh ubuntu@<YOUR_INSTANCE_IP>
+    export TF_VAR_tenancy_ocid="ocid1.tenancy..."
+    export TF_VAR_user_ocid="ocid1.user..."
+    export TF_VAR_fingerprint="xx:xx:xx..."
+    export TF_VAR_private_key_path="~/.oci/oci_api_key.pem"
+    export TF_VAR_region="your-region-1"
+    export TF_VAR_compartment_ocid="ocid1.compartment..."
+    export TF_VAR_ssh_public_key="ssh-rsa AAAA..."
+    export TF_VAR_llm_api_key="your-api-key-here"
     ```
-3.  **Monitor Progress:**
+4.  **Deploy! 🏗️**
+    ```bash
+    terraform init
+    terraform plan    # Recommended: Review what will be created
+    terraform apply -auto-approve
+    ```
+5.  **📥 DOWNLOAD CRITICAL FILES NOW!**
+    Use the Cloud Shell **"Actions" > "Download File"** menu (top right) to save these to your local PC:
+    - `.ssh/id_rsa` (If you generated a key) or your private key file
+    - `openclaw-cloud-quickstarter/oracle/terraform.tfstate` (Required to manage/delete later)
+
+> [!CAUTION]
+> **Do not skip Step 5.** If your session expires, the `terraform.tfstate` file is deleted from the cloud, and you will not be able to update or delete your instance later.
+
+---
+
+### 🔵 Phase 2: On Your Local PC (Access & Monitoring)
+
+Now that the instance is up, you can move to your local computer's terminal (Mac, Linux, or WSL).
+
+1.  **Set Permissions:**
+    - **Linux/Mac:**
+      ```bash
+      chmod 400 your_private_key.pem
+      ```
+    - **Windows (PowerShell):**
+      ```powershell
+      icacls .\your_private_key.pem /inheritance:r
+      icacls .\your_private_key.pem /grant:r "$($env:username):R"
+      ```
+2.  **Create SSH Tunnel & Connect:**
+    Run this command and **keep it running**:
+    ```bash
+    ssh -i ./your_private_key.pem -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
+    ```
+    *(The IP address is shown in the Terraform output in Phase 1.)*
+
+3.  **Monitor Installation (In the session above):**
+    OpenClaw takes ~15 mins to install. Run this inside the SSH window to monitor:
     ```bash
     ./check-progress.sh
     ```
-4.  **Verify Service:**
-    Wait for setup to complete, then run:
-    ```bash
-    pm2 status
-    ```
 
-## 🎉 Finalizing Setup
+4.  **Access the Dashboard:**
+    Once complete, open your browser to:
+    `http://localhost:18789`
 
-### 🪄 Access the Web UI (Securely)
-OpenClaw is bound to `localhost` for maximum security. To access the web interface from your local computer:
+---
 
-1.  **Open a new terminal** on your local machine.
-2.  **Run the SSH Tunnel command** (point to your downloaded `id_rsa` file):
-    ```bash
-    ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
-    ```
-    *(Note: If the command fails, make sure you are in the folder where you downloaded `id_rsa`, usually your **Downloads** folder.)*
-3.  **Open your browser** and go to: `http://localhost:18789`
-4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
+## 📊 Management & Monitoring
 
 ### 🪄 The Onboarding Wizard
 Connect messaging channels (Discord/Telegram), or change your persona:

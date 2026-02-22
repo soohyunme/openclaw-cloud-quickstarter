@@ -7,138 +7,85 @@ This Terraform template provisions a **Free Tier (12 Months)** compatible EC2 In
 
 ---
 
-## 🚀 Quick Start (Using AWS CloudShell)
+## 🚀 Quick Start (Two-Phase Setup)
 
-The easiest way to deploy is using **AWS CloudShell** (a free terminal in your browser). No local installation required!
-
-### 1. Open CloudShell
-1.  Log in to the [AWS Management Console](https://aws.amazon.com/console/).
-2.  Click the **CloudShell** icon (`>_`) in the top-right header (or search for CloudShell).
-3.  Wait for the terminal to initialize.
-
-### 2. Install Terraform
-AWS CloudShell needs Terraform installed manually. Run these commands:
-
-```bash
-wget https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
-unzip terraform_1.9.0_linux_amd64.zip
-sudo mv terraform /usr/bin/
-```
-
-Verify installation:
-```bash
-terraform -version
-```
-
-### 3. Download the Code
-Run the following commands in CloudShell:
-```bash
-git clone https://github.com/soohyunme/openclaw-cloud-quickstarter.git
-cd openclaw-cloud-quickstarter/aws
-```
-
-### 🏗️ Default Infrastructure
-By default, this template provisions:
-- **Compute:** `t3.micro` (2 vCPU, 1GB RAM) - Universal Free Tier.
-- **Fixed IP:** Elastic IP (EIP) attached to the instance.
-- **Network:** Dedicated VPC with a public subnet and Internet Gateway.
-- **Security:** Security Group rules for SSH (22). **Access to OpenClaw (18789) is restricted via SSH Tunneling.**
-- **Automation:** User Data script to install Node.js, PM2, and OpenClaw bound to localhost.
-
-### 4. Configuration
-Set your variables using `export` (simplest for CloudShell):
-
-1. **Generate SSH Key** (If you don't have one):
-   ```bash
-   ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-   ```
-
-2. **Set Variables**:
-   ```bash
-   # 1. Set your AWS Region (Auto-detected in CloudShell)
-   export TF_VAR_aws_region=$AWS_REGION
-
-   # 2. Set your LLM API Key (Anthropic or OpenAI)
-   # If you don't have one yet, use "none"
-   export TF_VAR_llm_api_key="sk-ant-..."
-   ```
-
-> **💡 Tip:** Advanced users can create a `terraform.tfvars` file using `nano` or `vim` for persistent configuration. See `terraform.tfvars.example`.
-
-### 5. Deploy! 🏗️
-Initialize Terraform and review the execution plan before applying:
-```bash
-terraform init
-terraform plan    # Recommended: Review what will be created
-terraform apply
-```
-When prompted, review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
-
-> [!TIP]
-> **For Faster Deployment:** You can use `terraform apply -auto-approve` to skip the "yes" prompt. However, it is **highly recommended** to run `terraform plan` first at least once to ensure you are not creating unexpected resources or costs.
-
-### ⚠️ CRITICAL: Cloud Shell Session Timeout
-> [!WARNING]
-> AWS CloudShell is an **ephemeral session**. If you are idle for 20-30 minutes, or if your browser closes, **all local files (including your SSH keys and `terraform.tfstate`) will be PERMANENTLY LOST.**
-> 
-> **You MUST download these files to your local PC immediately after `terraform apply`!**
-
-#### 💾 How to Backup to Your Local PC:
-1.  **Download State:** In CloudShell, click **Actions** (top right) -> **Download File**. Path: `openclaw-cloud-quickstarter/aws/terraform.tfstate`
-2.  **Download Private Key:** Path: `.ssh/id_rsa`
-3.  **Store Safely:** Keep these together in a folder on your computer.
-
-#### 💻 How to Connect from Your Local PC (Safe Way):
-If CloudShell expires, you can connect from your own computer (Mac/Linux/WSL):
-1.  Move the downloaded `id_rsa` to your `~/.ssh/` folder or a safe directory.
-2.  **Set Permissions (Required):** `chmod 400 id_rsa`
-3.  **SSH Command:**
-    ```bash
-    ssh -i id_rsa ubuntu@<YOUR_EIP_IP>
-    ```
+CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Phase** approach: **Build** in the cloud, then **Control** from your local machine.
 
 ---
 
-Once deployment is complete (approx. 15-20 minutes), SSH into your server:
+### 🟢 Phase 1: In AWS CloudShell (Infrastructure)
 
-1.  **Open Cloud Shell** (if not already open).
-2.  **SSH Command:**
+1.  **Open [AWS CloudShell](https://console.aws.amazon.com/cloudshell/home)** in your preferred region.
+2.  **Install Terraform** (Required once per session):
     ```bash
-    ssh -i ~/.ssh/id_rsa ubuntu@<YOUR_INSTANCE_IP>
+    wget https://releases.hashicorp.com/terraform/1.9.0/terraform_1.9.0_linux_amd64.zip
+    unzip terraform_1.9.0_linux_amd64.zip
+    sudo mv terraform /usr/bin/
     ```
-3.  **Monitor Progress:**
+3.  **Clone this repository:**
     ```bash
-    ./check-progress.sh
+    git clone https://github.com/soohyunme/openclaw-cloud-quickstarter.git
+    cd openclaw-cloud-quickstarter/aws
     ```
-4.  **Verify Service:**
-    Wait for setup to complete, then run:
+4.  **Generate SSH Key** (If you don't have one):
     ```bash
-    pm2 status
+    ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
     ```
+5.  **Set your API Key:**
+    ```bash
+    export TF_VAR_llm_api_key="your-api-key-here"
+    ```
+6.  **Deploy! 🏗️**
+    ```bash
+    terraform init
+    terraform plan    # Recommended: Review what will be created
+    terraform apply -auto-approve
+    ```
+7.  **📥 DOWNLOAD CRITICAL FILES NOW!**
+    Use the CloudShell **"Actions" > "Download File"** menu (top right) to save these to your local PC:
+    - `.ssh/id_rsa` (Your private key)
+    - `openclaw-cloud-quickstarter/aws/terraform.tfstate` (Required to manage/delete later)
 
-### 🪄 Access the Web UI (Securely)
-OpenClaw is bound to `localhost` for maximum security. To access the web interface from your local computer:
+> [!CAUTION]
+> **Do not skip Step 7.** If your CloudShell session expires, these files are deleted from the cloud, and you will lose control of your instance.
 
-1.  **Open a new terminal** on your local machine.
-2.  **Run the SSH Tunnel command** (point to your downloaded `id_rsa` file):
+---
+
+### � Phase 2: On Your Local PC (Access & Monitoring)
+
+Now that the instance is running, you can move to your local computer's terminal (Mac, Linux, or WSL).
+
+1.  **Find your Downloads folder** (or where you saved the files).
+2.  **Set Key Permissions:**
+    - **Linux/Mac:**
+      ```bash
+      chmod 400 id_rsa
+      ```
+    - **Windows (PowerShell):**
+      ```powershell
+      icacls .\id_rsa /inheritance:r
+      icacls .\id_rsa /grant:r "$($env:username):R"
+      ```
+3.  **Create SSH Tunnel & Connect:**
+    Run this command and **keep it running**:
     ```bash
     ssh -i ./id_rsa -L 18789:localhost:18789 ubuntu@<YOUR_INSTANCE_IP>
     ```
-    *(Note: If the command fails, make sure you are in the folder where you downloaded `id_rsa`, usually your **Downloads** folder.)*
-3.  **Open your browser** and go to: `http://localhost:18789`
-4.  **Profit!** This method bypasses "Secure Context" errors and keeps your gateway hidden from the public internet.
+    *(The IP address is shown in the Terraform output in Phase 1.)*
 
-### 🪄 The Onboarding Wizard
-Connect messaging channels (Discord/Telegram), or change your persona:
-```bash
-openclaw onboard
-```
+4.  **Monitor Installation (In the SSH window above):**
+    OpenClaw takes ~15 mins to install. Run this inside the SSH session to watch:
+    ```bash
+    ./check-progress.sh
+    ```
 
-### 📊 Check Status
-```bash
-pm2 status
-pm2 logs openclaw
-```
+5.  **Access the Dashboard:**
+    Once progress reaches 100%, open your browser to:
+    `http://localhost:18789`
+
+---
+
+## 📊 Management & Monitoring
 
 ---
 
