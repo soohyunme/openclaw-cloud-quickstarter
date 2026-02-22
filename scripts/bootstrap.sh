@@ -119,21 +119,28 @@ install_dependencies() {
     curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | sudo -E bash -
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
     
-    # pnpm
-    sudo corepack enable
-    sudo corepack prepare pnpm@$PNPM_VERSION --activate
+    # 💡 Fix: Install pnpm globally via npm instead of corepack (avoiding EACCES in some cloud-init envs)
+    sudo npm install -g pnpm@$PNPM_VERSION pm2
 }
 
 # 6. OpenClaw Installation
 install_openclaw() {
-    sudo npm install -g pm2
-    sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard"
+    # Ensure local bin directories exist and are owned by the user
+    sudo -u $USER mkdir -p /home/$USER/.local/bin /home/$USER/.local/share/pnpm
+
+    # Install OpenClaw as the user
+    # Note: We pass the full PATH to ensure pnpm/node are found
+    sudo -u $USER env PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USER/.local/bin" NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard"
     
-    # Global symlink for easy access
-    sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
+    # Global symlink for easy access - check both potential install locations
+    if [ -f "/home/$USER/.local/bin/openclaw" ]; then
+        sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
+    elif [ -f "/home/$USER/.npm-global/bin/openclaw" ]; then
+        sudo ln -sf /home/$USER/.npm-global/bin/openclaw /usr/local/bin/openclaw
+    fi
     
     # Cleanup
-    sudo -u $USER bash -c "export PATH=\$PATH:/home/$USER/.local/share/pnpm; pnpm store prune" || true
+    sudo -u $USER env PATH="$PATH:/home/$USER/.local/share/pnpm" bash -c "pnpm store prune" || true
     sudo apt-get clean
 }
 
