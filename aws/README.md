@@ -105,25 +105,6 @@ openclaw onboard
 
 ---
 
-### 🔵 Phase 2: Finish Setup (Onboarding)
-
-Once infrastructure is deployed, you must run the official onboarding wizard to configure your AI models.
-
-1.  **Connect to your instance:**
-    (Use the SSH command provided in the Terraform output)
-2.  **Monitor installation:**
-    ```bash
-    ./check-progress.sh
-    ```
-3.  **Run Onboarding Wizard:**
-    When setup is complete, run:
-    ```bash
-    openclaw onboard
-    ```
-    Follow the prompts to add your API keys (Anthropic, OpenAI, etc.). OpenClaw will handle the rest!
-
----
-
 ## 🛠️ Advanced Options
 
 ### 🧹 Clean Up (Destroy)
