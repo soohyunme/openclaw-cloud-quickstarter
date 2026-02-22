@@ -122,50 +122,64 @@ fi
 
 # --- Provider and Model Refinement ---
 
-# Case 0: Exploration Mode (None) - Start with a skeleton config for UI exploration
 if [[ "$LLM_API_KEY" == "none" ]]; then
-  export PROVIDER="anthropic"
-  export MODEL="claude-3-5-sonnet-20241022"
-  PROVIDER_EXTRAS=', "api": "anthropic-completions", "baseUrl": "https://api.anthropic.com", "models": []'
+  # Exploration Mode: Omit models/agents config to let 'onboard' handle everything
+  MODELS_CONFIG=""
+else
+  # Case 1: Anthropic
+  if [[ "$PROVIDER" == "anthropic" ]]; then
+    export MODEL="$OPENCLAW_MODEL"
+    PROVIDER_EXTRAS=', "api": "anthropic-messages", "baseUrl": "https://api.anthropic.com", "models": []'
 
-# Case 1: Anthropic
-elif [[ "$PROVIDER" == "anthropic" ]]; then
-  export MODEL="$OPENCLAW_MODEL"
-  PROVIDER_EXTRAS=', "api": "anthropic-completions", "baseUrl": "https://api.anthropic.com", "models": []'
+  # Case 2: OpenAI
+  elif [[ "$PROVIDER" == "openai" ]]; then
+    export MODEL="$OPENCLAW_MODEL"
+    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.openai.com/v1", "models": []'
 
-# Case 2: OpenAI
-elif [[ "$PROVIDER" == "openai" ]]; then
-  export MODEL="$OPENCLAW_MODEL"
-  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.openai.com/v1", "models": []'
+  # Case 3: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
+  elif [[ "$LLM_API_KEY" == nvapi-* ]]; then
+    export PROVIDER="nvidia"
+    if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
+      export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
+    else
+      export MODEL="$OPENCLAW_MODEL"
+    fi
+    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
 
-# Case 3: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
-elif [[ "$LLM_API_KEY" == nvapi-* ]]; then
-  export PROVIDER="nvidia"
-  # NVIDIA NIM requires specific model naming
-  if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
-    export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
+  # Case 4: Moonshot Direct API
+  elif [[ "$PROVIDER" == "moonshot" ]]; then
+    export MODEL="$OPENCLAW_MODEL"
+    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.moonshot.cn/v1", "models": []'
+
+  # Case 5: DeepSeek Direct API
+  elif [[ "$PROVIDER" == "deepseek" ]]; then
+    export MODEL="$OPENCLAW_MODEL"
+    PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.deepseek.com", "models": []'
+
+  # Case 6: Other providers
   else
     export MODEL="$OPENCLAW_MODEL"
+    PROVIDER_EXTRAS=""
   fi
-  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
 
-# Case 4: Moonshot Direct API
-elif [[ "$PROVIDER" == "moonshot" ]]; then
-  export MODEL="$OPENCLAW_MODEL"
-  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.moonshot.cn/v1", "models": []'
-
-# Case 5: DeepSeek Direct API
-elif [[ "$PROVIDER" == "deepseek" ]]; then
-  export MODEL="$OPENCLAW_MODEL"
-  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.deepseek.com", "models": []'
-
-# Case 6: Other providers
-else
-  export MODEL="$OPENCLAW_MODEL"
-  PROVIDER_EXTRAS=""
+  # Build the models and agents configuration string
+  MODELS_CONFIG=",
+  \"models\": {
+    \"providers\": {
+      \"$PROVIDER\": {
+        \"apiKey\": \"$LLM_API_KEY\"$PROVIDER_EXTRAS
+      }
+    }
+  },
+  \"agents\": {
+    \"defaults\": {
+      \"model\": {
+        \"primary\": \"$PROVIDER/$MODEL\"
+      }
+    }
+  }"
 fi
 
-# Create openclaw.json using tee (loopback binding for SSH Tunneling security)
 cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
   "gateway": {
@@ -175,21 +189,7 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
       "mode": "token",
       "token": "$GATEWAY_TOKEN"
     }
-  },
-  "models": {
-    "providers": {
-      "$PROVIDER": {
-        "apiKey": "$LLM_API_KEY"$PROVIDER_EXTRAS
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      "model": {
-        "primary": "$PROVIDER/$MODEL"
-      }
-    }
-  }
+  }$MODELS_CONFIG
 }
 EOF
 
