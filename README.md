@@ -9,7 +9,10 @@ This repository provides **one-click deployment templates** (Terraform) to set u
 | Cloud Provider | Cost (Free Tier) | Specs | Guide |
 | :--- | :--- | :--- | :---: |
 | **[Oracle Cloud](https://cloud.oracle.com/)** | **Lifetime Free** | 4 OCPU / 24GB RAM | [📖 Start Guide](./oracle) |
-| **[AWS](https://console.aws.amazon.com/)** | 12 Months Free | 2 vCPU / 1GB RAM | [📖 Start Guide](./aws) |
+| **[AWS](https://console.aws.amazon.com/)** | Free Tier Eligible | t3.small / 2GB RAM | [📖 Start Guide](./aws) |
+
+> [!NOTE]
+> AWS Free Tier eligibility varies by account age (e.g., 6-12 months). Check the **[Official AWS Free Tier Page](https://aws.amazon.com/free/)** for details.
 
 ---
 

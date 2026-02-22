@@ -10,8 +10,8 @@ variable "namespace" {
 }
 
 variable "instance_type" {
-  description = "EC2 Instance Type (t3.micro is usually recommended for free tier in most regions)"
-  default     = "t3.micro"
+  description = "EC2 Instance Type (t3.small is recommended for better performance; free tier eligible for 6 months on new accounts)"
+  default     = "t3.small"
 }
 
 variable "disk_size_gb" {

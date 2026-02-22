@@ -1,15 +1,13 @@
-# === AWS Free Tier (Default) ===
-# aws_region    = "us-east-1"
-# instance_type = "t3.micro"
+# === Recommended (New Accounts / 2025 Policy) ===
+# t3.small (2GB RAM) is typically FREE for 6 months via credits and much more stable.
+# instance_type = "t3.small"
+# aws_region    = "us-east-1"  # Optional: Usually set via environment variable in CloudShell
 # disk_size_gb  = 30
-# disk_type     = "gp3"          # gp3 is newer and often slightly better
+# disk_type     = "gp3"
 
-# === Performance Config (Paid) ===
-# Uncomment below for better performance (Cost: ~$10-20/mo)
-# instance_type = "t3.small"     # 2 vCPU, 2GB RAM
-# disk_size_gb  = 30             # 30GB (Still free tier eligible!)
-# disk_type     = "gp3"          # Faster SSD
+# === Legacy / Old Accounts (Before July 2025) ===
+# Use t3.micro (1GB RAM) for 12 months free.
+# instance_type = "t3.micro"
 
-# === OpenClaw AI Model ===
-# openclaw_model = "claude-3-5-sonnet-20241022"
-# llm_api_key    = "sk-ant-..."
+# Note: LLM Provider and API key are now configured via 'openclaw onboard' 
+# after the infrastructure is deployed.

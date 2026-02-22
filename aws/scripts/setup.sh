@@ -124,46 +124,37 @@ EOF
 # Automatically fix/fill provider-specific configuration (important for Moonshot/Gemini)
 sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
 
-# Start OpenClaw Gateway as a service only if API Key is provided
-if [[ "$LLM_API_KEY" != "none" && -n "$LLM_API_KEY" ]]; then
-  # Ensure PM2 has the right environment and retry start
-  sudo -u $USER /usr/bin/pm2 delete openclaw >/dev/null 2>&1 || true
-  sudo -u $USER /usr/bin/pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run
-  sudo -u $USER /usr/bin/pm2 save
-  
-  # Wait and verify listening port
-  echo "⌛ Waiting for OpenClaw to start listening on port 18789..."
-  sleep 15
-  if ! netstat -tulnp | grep -q ":18789"; then
-      echo "⚠️ OpenClaw is NOT listening on port 18789. Checking doctor..."
-      sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive || true
-      sudo -u $USER /usr/bin/pm2 restart openclaw
-      sleep 10
-  fi
+# Start OpenClaw Gateway as a service
+# We start it even if no key is provided so the user can use the Dashboard onboarder.
+sudo -u $USER /usr/bin/pm2 delete openclaw >/dev/null 2>&1 || true
+sudo -u $USER /usr/bin/pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run
+sudo -u $USER /usr/bin/pm2 save
 
-  # PM2 startup setup
-  sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
-  sudo systemctl enable pm2-$USER || true
-  sudo systemctl start pm2-$USER || true
-  
-  if netstat -tulnp | grep -q ":18789"; then
-      STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
-      LOG_INFO="    Check logs: pm2 logs openclaw"
-      ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
-      HELP_TIPS="    💡 Security: Web UI is bound to localhost with a secure token.
-    🔗 Access: Click this link (Requires SSH Tunnel):
-       http://localhost:18789/#token=$GATEWAY_TOKEN"
-  else
-      STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
-      LOG_INFO="    Run: pm2 logs openclaw --lines 50"
-      ONBOARD_INFO="    Try: openclaw doctor --fix"
-      HELP_TIPS="    Common Cause: Invalid API Key or Config Issue."
-  fi
+# Wait and verify listening port
+echo "⌛ Waiting for OpenClaw to start listening on port 18789..."
+sleep 15
+if ! netstat -tulnp | grep -q ":18789"; then
+    echo "⚠️ OpenClaw is NOT listening on port 18789. Checking doctor..."
+    sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive || true
+    sudo -u $USER /usr/bin/pm2 restart openclaw
+    sleep 10
+fi
+
+# PM2 startup setup
+sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
+sudo systemctl enable pm2-$USER || true
+sudo systemctl start pm2-$USER || true
+
+if netstat -tulnp | grep -q ":18789"; then
+    STATUS_LINE=" ✅ OpenClaw Platform is READY"
+    LOG_INFO="    Join Dashboard: http://localhost:18789/#token=$GATEWAY_TOKEN"
+    ONBOARD_INFO="    👉 Run 'openclaw onboard' to set up your AI models!"
+    HELP_TIPS="    💡 Security: Web UI is bound to localhost with a secure token."
 else
-  STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
-  LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs, then start manually."
-  ONBOARD_INFO="    (LLM_API_KEY was not set during deployment)"
-  HELP_TIPS="    Action: Edit ~/.openclaw/openclaw.json then 'pm2 start openclaw'"
+    STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
+    LOG_INFO="    Run: pm2 logs openclaw --lines 50"
+    ONBOARD_INFO="    Try: openclaw doctor --fix"
+    HELP_TIPS="    Common Cause: Low resources or config conflict."
 fi
 
 # 6. Configure Firewall (SSH only, Gateway via Tunnel)

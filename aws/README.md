@@ -1,9 +1,14 @@
 # 🦞 OpenClaw AWS Starter
 
-Create your own **OpenClaw AI Agent** on **Amazon Web Services (AWS)** in minutes.
-This Terraform template provisions a **Free Tier (12 Months)** compatible EC2 Instance and automatically installs:
+Create your own **OpenClaw AI Agent** on **Amazon Web Services (AWS)** in minutes4. This Terraform template provisions a **Free Tier** compatible EC2 Instance and automatically installs:
 1.  **OpenClaw:** The AI agent platform
 2.  **Node.js & PM2:** Process management and runtime environment
+
+> [!IMPORTANT]
+> **AWS Free Tier update (July 2025):**
+> - **Recommended (New Accounts):** Use **t3.small** (2GB RAM). It is often free for 6 months via credits.
+> - **Old Accounts:** Use **t3.micro** (1GB RAM) for 12 months free.
+> - Detailed eligibility: **[Official AWS Free Tier Page](https://aws.amazon.com/free/)**
 
 ---
 
