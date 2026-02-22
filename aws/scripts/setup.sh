@@ -5,6 +5,10 @@ set -euo pipefail
 USER="ubuntu"
 PROVIDER_EXTRAS=""
 
+# Variable injection from Terraform
+OPENCLAW_MODEL="${OPENCLAW_MODEL}"
+LLM_API_KEY="${LLM_API_KEY}"
+
 # Create a progress checker for the user
 cat <<EOF > /home/$USER/check-progress.sh
 #!/bin/bash
@@ -90,32 +94,32 @@ sudo apt-get clean
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
 # Parse Provider and Model
-if [[ "${LLM_API_KEY}" == nvapi-* ]]; then
+if [[ "$LLM_API_KEY" == nvapi-* ]]; then
   # For NVIDIA NIM, force provider to 'nvidia' but keep full model ID
   export PROVIDER="nvidia"
-  export MODEL="${OPENCLAW_MODEL}"
-elif [[ "${OPENCLAW_MODEL}" == *"/"* ]]; then
+  export MODEL="$OPENCLAW_MODEL"
+elif [[ "$OPENCLAW_MODEL" == *"/"* ]]; then
   # Standard format: provider/model
-  export PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
-  export MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
+  export PROVIDER=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f1)
+  export MODEL=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f2-)
 else
   # Default to Anthropic
   export PROVIDER="anthropic"
-  export MODEL="${OPENCLAW_MODEL}"
+  export MODEL="$OPENCLAW_MODEL"
 fi
 
 # Default provider extras (empty for standard providers like OpenAI/Anthropic)
 PROVIDER_EXTRAS=""
 
 # Special Case: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
-if [[ "${LLM_API_KEY}" == nvapi-* ]]; then
+if [[ "$LLM_API_KEY" == nvapi-* ]]; then
   export PROVIDER="nvidia"
   # NVIDIA NIM requires specific model naming (usually provider/model or just model)
   # If the model starts with moonshot/, it should be moonshotai/ for NVIDIA NIM
-  if [[ "${OPENCLAW_MODEL}" == moonshot/* ]]; then
-    export MODEL="moonshotai/${OPENCLAW_MODEL#moonshot/}"
+  if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
+    export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
   else
-    export MODEL="${OPENCLAW_MODEL}"
+    export MODEL="$OPENCLAW_MODEL"
   fi
   PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
 # Special Case: Moonshot Direct API
@@ -144,7 +148,7 @@ cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
   "models": {
     "providers": {
       "$PROVIDER": {
-        "apiKey": "${LLM_API_KEY}"$PROVIDER_EXTRAS
+        "apiKey": "$LLM_API_KEY"$PROVIDER_EXTRAS
       }
     }
   },
@@ -162,7 +166,7 @@ EOF
 sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
 
 # Start OpenClaw Gateway as a service only if API Key is provided
-if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
+if [[ "$LLM_API_KEY" != "none" && -n "$LLM_API_KEY" ]]; then
   # Ensure PM2 has the right environment and retry start
   sudo -u $USER /usr/bin/pm2 delete openclaw >/dev/null 2>&1 || true
   sudo -u $USER /usr/bin/pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run
