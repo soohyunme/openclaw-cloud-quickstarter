@@ -31,9 +31,13 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
     ```bash
     ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
     ```
-5.  **Set your API Key:**
+5.  **Set your variables:**
     ```bash
-    export TF_VAR_llm_api_key="your-api-key-here"
+    export TF_VAR_aws_region=$AWS_REGION
+    export TF_VAR_llm_api_key="your-api-key-here" # Use "none" to explore without a key
+
+    # (Optional) Change AI model. Default: claude-3-5-sonnet-20241022
+    # export TF_VAR_openclaw_model="openai/gpt-4o"
     ```
 6.  **Deploy! 🏗️**
     ```bash
@@ -106,6 +110,7 @@ openclaw onboard
 ### 🧹 Clean Up (Destroy)
 To remove all resources and stop billing (if any):
 ```bash
+export TF_VAR_aws_region=$AWS_REGION
 export TF_VAR_llm_api_key="none" # Skip key prompt
 terraform destroy
 ```
@@ -115,7 +120,7 @@ terraform destroy
 
 ## ⚠️ Troubleshooting
 *   **"Control UI requires device identity" or "device token mismatch":**
-    1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
+    1.  Ensure you are using the **SSH Tunnel** (Phase 2) via `http://localhost:18789`.
     2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.
     3.  Alternatively, run this on the server to get a fresh login URL:
         ```bash
@@ -129,6 +134,7 @@ terraform destroy
 
 ## 📝 Notes on Free Tier
 *   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.
+    - *Tip*: You can override this by running `export TF_VAR_instance_type="t3.small"` before `terraform apply`.
 *   **Public IP (EIP):** Includes one Elastic IP. AWS provides 750 hours of public IPv4 for free per month during the first 12 months.
 *   **Region:** Free Tier rules can vary by region. **Always check the "Free Tier eligible" tag in your AWS Console** before launching.
 

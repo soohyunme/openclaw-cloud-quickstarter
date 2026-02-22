@@ -86,7 +86,7 @@ export NODE_OPTIONS="--max-old-space-size=2048"
 # 4. Install OpenClaw (From Git Source) & PM2
 # Note: This step is resource-intensive (pnpm install & build) and takes 10-15 mins on 1GB RAM.
 sudo npm install -g pm2
-sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git --no-onboard"
+sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard"
 
 # 4b. Ensure command is globally accessible immediately
 sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
@@ -175,12 +175,12 @@ if [[ "$LLM_API_KEY" != "none" && -n "$LLM_API_KEY" ]]; then
   
   # Wait and verify listening port
   echo "⌛ Waiting for OpenClaw to start listening on port 18789..."
-  sleep 5
+  sleep 15
   if ! netstat -tulnp | grep -q ":18789"; then
       echo "⚠️ OpenClaw is NOT listening on port 18789. Checking doctor..."
       sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive || true
       sudo -u $USER /usr/bin/pm2 restart openclaw
-      sleep 5
+      sleep 10
   fi
 
   # PM2 startup setup
@@ -222,8 +222,10 @@ echo -e "\n\n" | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
 echo -e " 🦞 Welcome to Your OpenClaw Server on Amazon Web Services! " | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
-echo -e "$${STATUS_LINE}" | sudo tee -a /etc/motd
-echo -e "$${LOG_INFO}" | sudo tee -a /etc/motd
-echo -e "$${ONBOARD_INFO}" | sudo tee -a /etc/motd
-echo -e "$${HELP_TIPS}" | sudo tee -a /etc/motd
+echo -e "$${STATUS_LINE:-Status: Unknown}" | sudo tee -a /etc/motd
+echo -e "$${LOG_INFO:-}" | sudo tee -a /etc/motd
+echo -e "$${ONBOARD_INFO:-}" | sudo tee -a /etc/motd
+echo -e "$${HELP_TIPS:-}" | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
+
+echo "--- Setup Completed at $(date) ---"
