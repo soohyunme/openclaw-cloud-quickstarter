@@ -18,12 +18,7 @@
 # boot_volume_size_in_gbs = 50
 # availability_domain_number = 1
 
-# =============================================================
-# OpenClaw Platform
-# =============================================================
-# openclaw_model = "claude-3-5-sonnet-latest"
-# llm_api_key    = "none" # Use onboarder for easy setup
-
+# 💡 TIP: 
 # 💡 TIP: 
 # After 'terraform apply', run 'openclaw onboard' on the server 
 # to configure your AI models and personas interactively!
