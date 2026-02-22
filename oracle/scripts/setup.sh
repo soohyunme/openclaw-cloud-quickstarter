@@ -120,7 +120,7 @@ if [[ "$LLM_API_KEY" == nvapi-* ]]; then
   else
     export MODEL="$OPENCLAW_MODEL"
   fi
-  PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
+  PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "api": "openai-completions", "models": []'
 # Special Case: Moonshot Direct API
 elif [[ "$PROVIDER" == "moonshot" ]]; then
   PROVIDER_EXTRAS=', "baseUrl": "https://api.moonshot.cn/v1", "models": []'

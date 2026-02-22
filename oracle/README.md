@@ -125,12 +125,15 @@ pm2 logs openclaw
 
 ---
 
-## 🧹 Clean Up (Destroy)
+### 🧹 Clean Up (Destroy)
 To remove all resources and stop billing (if any):
 ```bash
 export TF_VAR_llm_api_key="none" # Skip key prompt
 terraform destroy
 ```
+
+> [!TIP]
+> To skip the confirmation prompt during cleanup, use: `terraform destroy -auto-approve`
 
 ## ⚠️ Troubleshooting
 *   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain.

@@ -142,12 +142,15 @@ pm2 logs openclaw
 
 ---
 
-## 🧹 Clean Up (Destroy)
+### 🧹 Clean Up (Destroy)
 To remove all resources and stop billing (if any):
 ```bash
 export TF_VAR_llm_api_key="none" # Skip key prompt
 terraform destroy
 ```
+
+> [!TIP]
+> To skip the confirmation prompt during cleanup, use: `terraform destroy -auto-approve`
 
 ## ⚠️ Troubleshooting
 *   **pm2 command not found:** If the installation just finished, you might need to refresh your environment: `source ~/.bashrc`.
