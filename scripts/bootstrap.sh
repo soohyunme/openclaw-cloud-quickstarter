@@ -131,7 +131,7 @@ install_openclaw() {
         "/usr/bin/openclaw"
     )
     
-    for p in "${POSSIBLE_PATHS[@]}"; do
+    for p in "$${POSSIBLE_PATHS[@]}"; do
         if [ -x "$p" ]; then
             FOUND_BIN="$p"
             break
