@@ -113,26 +113,49 @@ else
   export MODEL="$OPENCLAW_MODEL"
 fi
 
-# Default provider extras (empty for standard providers like OpenAI/Anthropic)
-PROVIDER_EXTRAS=""
+# --- Provider and Model Refinement ---
 
-# Special Case: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
-if [[ "$LLM_API_KEY" == nvapi-* ]]; then
+# Case 0: Exploration Mode (None) - Start with a skeleton config for UI exploration
+if [[ "$LLM_API_KEY" == "none" ]]; then
+  export PROVIDER="anthropic"
+  export MODEL="claude-3-5-sonnet-20241022"
+  PROVIDER_EXTRAS=', "api": "anthropic-completions", "baseUrl": "https://api.anthropic.com", "models": []'
+
+# Case 1: Anthropic
+elif [[ "$PROVIDER" == "anthropic" ]]; then
+  export MODEL="$OPENCLAW_MODEL"
+  PROVIDER_EXTRAS=', "api": "anthropic-completions", "baseUrl": "https://api.anthropic.com", "models": []'
+
+# Case 2: OpenAI
+elif [[ "$PROVIDER" == "openai" ]]; then
+  export MODEL="$OPENCLAW_MODEL"
+  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.openai.com/v1", "models": []'
+
+# Case 3: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
+elif [[ "$LLM_API_KEY" == nvapi-* ]]; then
   export PROVIDER="nvidia"
-  # NVIDIA NIM requires specific model naming (usually provider/model or just model)
-  # If the model starts with moonshot/, it should be moonshotai/ for NVIDIA NIM
+  # NVIDIA NIM requires specific model naming
   if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
     export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
   else
     export MODEL="$OPENCLAW_MODEL"
   fi
-  PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "api": "openai-completions", "models": []'
-# Special Case: Moonshot Direct API
+  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://integrate.api.nvidia.com/v1", "models": []'
+
+# Case 4: Moonshot Direct API
 elif [[ "$PROVIDER" == "moonshot" ]]; then
-  PROVIDER_EXTRAS=', "baseUrl": "https://api.moonshot.cn/v1", "models": []'
-# Special Case: DeepSeek Direct API
+  export MODEL="$OPENCLAW_MODEL"
+  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.moonshot.cn/v1", "models": []'
+
+# Case 5: DeepSeek Direct API
 elif [[ "$PROVIDER" == "deepseek" ]]; then
-  PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
+  export MODEL="$OPENCLAW_MODEL"
+  PROVIDER_EXTRAS=', "api": "openai-completions", "baseUrl": "https://api.deepseek.com", "models": []'
+
+# Case 6: Other providers
+else
+  export MODEL="$OPENCLAW_MODEL"
+  PROVIDER_EXTRAS=""
 fi
 
 # Create openclaw.json using tee (loopback binding for SSH Tunneling security)
