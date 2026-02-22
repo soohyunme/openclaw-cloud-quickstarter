@@ -66,12 +66,16 @@ Set your variables using `export` (simplest for CloudShell):
 > **💡 Tip:** Advanced users can create a `terraform.tfvars` file using `nano` or `vim` for persistent configuration. See `terraform.tfvars.example`.
 
 ### 5. Deploy! 🏗️
-Initialize Terraform and apply the configuration:
+Initialize Terraform and review the execution plan before applying:
 ```bash
 terraform init
+terraform plan    # Recommended: Review what will be created
 terraform apply
 ```
-Review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
+When prompted, review the execution plan. If the proposed changes are correct, type **yes** to approve and proceed with the deployment.
+
+> [!TIP]
+> **For Faster Deployment:** You can use `terraform apply -auto-approve` to skip the "yes" prompt. However, it is **highly recommended** to run `terraform plan` first at least once to ensure you are not creating unexpected resources or costs.
 
 ### ⚠️ CRITICAL: Cloud Shell Session Timeout
 > [!WARNING]
