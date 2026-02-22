@@ -80,8 +80,8 @@ Now that the instance is up, you can move to your local computer's terminal (Mac
     ```
 
 4.  **Access the Dashboard:**
-    Once complete, open your browser to:
-    `http://localhost:18789`
+    Once complete, **copy the full access link (including the #token=... part)** shown in your terminal and paste it into your browser:
+    `http://localhost:18789/#token=...`
 
 ---
 
@@ -117,7 +117,6 @@ terraform destroy
 
 ## ⚠️ Troubleshooting
 *   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain.
-*   **pm2 command not found:** If the installation just finished, refresh your environment: `source ~/.bashrc`.
 *   **"Control UI requires device identity" or "device token mismatch":**
     1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
     2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.

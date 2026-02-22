@@ -84,8 +84,8 @@ Now that the instance is running, you can move to your local computer's terminal
     ```
 
 5.  **Access the Dashboard:**
-    Once progress reaches 100%, open your browser to:
-    `http://localhost:18789`
+    Once progress reaches 100%, **copy the full access link (including the #token=... part)** shown in your terminal and paste it into your browser:
+    `http://localhost:18789/#token=...`
 
 ---
 
@@ -114,7 +114,6 @@ terraform destroy
 > To skip the confirmation prompt during cleanup, use: `terraform destroy -auto-approve`
 
 ## ⚠️ Troubleshooting
-*   **pm2 command not found:** If the installation just finished, you might need to refresh your environment: `source ~/.bashrc`.
 *   **"Control UI requires device identity" or "device token mismatch":**
     1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
     2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.
