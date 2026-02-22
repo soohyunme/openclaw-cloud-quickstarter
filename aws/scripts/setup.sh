@@ -58,6 +58,13 @@ if [ ! -f /swapfile ]; then
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 fi
 
+# 1. Optimize Node.js Memory (Crucial for micro instances)
+if ! grep -q "NODE_OPTIONS" /home/$USER/.bashrc; then
+    echo 'export NODE_OPTIONS="--max-old-space-size=1536"' >> /home/$USER/.bashrc
+    echo 'export PATH=$PATH:/home/'$USER'/.local/bin' >> /home/$USER/.bashrc
+fi
+export NODE_OPTIONS="--max-old-space-size=1536" 
+
 # 1. Update & Upgrade
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update && sudo apt-get upgrade -y
