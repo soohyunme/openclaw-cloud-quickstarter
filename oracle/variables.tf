@@ -18,10 +18,6 @@ variable "allowed_ssh_cidr" {
   default     = "0.0.0.0/0"
 }
 
-variable "gateway_cidr" {
-  description = "CIDR block allowed to access OpenClaw Gateway (port 18789). Default is open to world (0.0.0.0/0)."
-  default     = "0.0.0.0/0"
-}
 
 # 3. Instance Configuration
 variable "instance_shape" {

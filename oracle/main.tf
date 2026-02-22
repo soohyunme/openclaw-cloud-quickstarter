@@ -68,15 +68,6 @@ resource "oci_core_security_list" "openclaw_sl" {
     }
   }
 
-  # OpenClaw Gateway (WebSocket)
-  ingress_security_rules {
-    protocol = "6" # TCP
-    source   = var.gateway_cidr
-    tcp_options {
-      min = 18789
-      max = 18789
-    }
-  }
 }
 
 # 3. Compute Instance

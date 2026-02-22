@@ -9,9 +9,7 @@ This repository provides **one-click deployment templates** (Terraform) to set u
 | Cloud Provider | Cost (Free Tier) | Specs | Guide |
 | :--- | :--- | :--- | :---: |
 | **[Oracle Cloud](./oracle)** | **Lifetime Free** | 4 vCPU / 24GB RAM | [📖 Start Guide](./oracle) |
-| **[Google Cloud](./gcp)** | **Lifetime Free** | 2 vCPU / 1GB RAM | [📖 Start Guide](./gcp) |
 | **[AWS](./aws)** | 12 Months Free | 2 vCPU / 1GB RAM | [📖 Start Guide](./aws) |
-| **[Azure](./azure)** | 12 Months Free | 1 vCPU / 1GB RAM | [📖 Start Guide](./azure) |
 
 ---
 
@@ -20,10 +18,10 @@ The following ports are automatically opened for your convenience:
 
 | Port | Protocol | Service | Description |
 | :--- | :---: | :--- | :--- |
-| **22** | SSH | System Access | Secure Shell access |
-| **18789** | TCP | **OpenClaw** | Gateway WebSocket |
+| **22** | SSH | System Access | Secure Shell access (Mandatory) |
 
-> **Note:** Ports 80, 443, 8080 (Web IDE), and 3000 are NOT opened by default to minimize attack surface.
+> [!IMPORTANT]
+> **Secure by Default**: Access to the OpenClaw Gateway (18789) is restricted to `localhost` and must be accessed via **SSH Tunneling**. This keeps your agent hidden from the public internet.
 
 ## 🎯 Why use this?
 - **Zero Config:** Automatically installs Node.js, OpenClaw, and dependencies.
@@ -39,7 +37,8 @@ Choose your preferred cloud provider from the table above and follow the guide!
 1. Go to the **[Oracle Quickstart Guide](./oracle)**.
 2. Launch Cloud Shell.
 3. Run `terraform apply` and type **yes** when prompted.
-4. Enjoy your free 4 OCPU / 24GB RAM agent!
+4. **Access UI**: Run the SSH Tunnel command shown in your terminal.
+5. Enjoy your free 4 OCPU / 24GB RAM agent!
 
 ---
 **Contributions are welcome!** Feel free to submit a PR for other cloud providers.

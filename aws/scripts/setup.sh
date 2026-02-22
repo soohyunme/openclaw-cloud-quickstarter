@@ -3,6 +3,14 @@ set -euo pipefail
 
 # AWS default user for Ubuntu is 'ubuntu'
 USER="ubuntu"
+PROVIDER_EXTRAS=""
+
+# Variable injection from Terraform
+OPENCLAW_MODEL="${OPENCLAW_MODEL}"
+LLM_API_KEY="${LLM_API_KEY}"
+
+# Generate Gateway Token early for injection
+GATEWAY_TOKEN=$(openssl rand -hex 16)
 
 # Create a progress checker for the user
 cat <<EOF > /home/$USER/check-progress.sh
@@ -32,6 +40,8 @@ done
 echo -e "\n-------------------------------------------------------------"
 echo "✅ INSTALLATION COMPLETE!"
 echo "🚀 Your OpenClaw server is ready."
+echo "🔗 Access Dashboard: http://localhost:18789/#token=$GATEWAY_TOKEN"
+echo "   (Requires SSH Tunnel: ssh -L 18789:localhost:18789 ...)"
 echo "👉 Run 'openclaw onboard' to finish your setup!"
 echo "   (If 'openclaw' is not found, run 'source ~/.bashrc' or use its full path: ~/.local/bin/openclaw onboard)"
 echo "-------------------------------------------------------------"
@@ -81,72 +91,129 @@ sudo -u $USER env PATH=$PATH NODE_OPTIONS="--max-old-space-size=2048" bash -c "c
 # 4b. Ensure command is globally accessible immediately
 sudo ln -sf /home/$USER/.local/bin/openclaw /usr/local/bin/openclaw
 
+# 4c. Cleanup to save disk space
+sudo -u $USER bash -c "export PATH=\$PATH:/home/$USER/.local/share/pnpm; pnpm store prune" || true
+sudo apt-get clean
+
 # 5. Configure OpenClaw (Fully Automated)
 sudo -u $USER mkdir -p /home/$USER/.openclaw
 
-# Parse Provider and Model from OPENCLAW_MODEL (format: provider/model)
-if [[ "${OPENCLAW_MODEL}" == *"/"* ]]; then
-  export PROVIDER=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f1)
-  export MODEL=$(echo "${OPENCLAW_MODEL}" | cut -d'/' -f2-)
+# Parse Provider and Model
+if [[ "$LLM_API_KEY" == nvapi-* ]]; then
+  # For NVIDIA NIM, force provider to 'nvidia' but keep full model ID
+  export PROVIDER="nvidia"
+  export MODEL="$OPENCLAW_MODEL"
+elif [[ "$OPENCLAW_MODEL" == *"/"* ]]; then
+  # Standard format: provider/model
+  export PROVIDER=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f1)
+  export MODEL=$(echo "$OPENCLAW_MODEL" | cut -d'/' -f2-)
 else
+  # Default to Anthropic
   export PROVIDER="anthropic"
-  export MODEL="${OPENCLAW_MODEL}"
+  export MODEL="$OPENCLAW_MODEL"
 fi
 
-# Create openclaw.json with the latest schema (2026.2.x)
-sudo -E -u $USER bash -c "cat <<EOF > /home/\$USER/.openclaw/openclaw.json
+# Default provider extras (empty for standard providers like OpenAI/Anthropic)
+PROVIDER_EXTRAS=""
+
+# Special Case: NVIDIA NIM (e.g., Kimi model via NVIDIA API)
+if [[ "$LLM_API_KEY" == nvapi-* ]]; then
+  export PROVIDER="nvidia"
+  # NVIDIA NIM requires specific model naming (usually provider/model or just model)
+  # If the model starts with moonshot/, it should be moonshotai/ for NVIDIA NIM
+  if [[ "$OPENCLAW_MODEL" == moonshot/* ]]; then
+    export MODEL="moonshotai/$${OPENCLAW_MODEL#moonshot/}"
+  else
+    export MODEL="$OPENCLAW_MODEL"
+  fi
+  PROVIDER_EXTRAS=', "baseUrl": "https://integrate.api.nvidia.com/v1", "api": "openai-completions", "models": []'
+# Special Case: Moonshot Direct API
+elif [[ "$PROVIDER" == "moonshot" ]]; then
+  PROVIDER_EXTRAS=', "baseUrl": "https://api.moonshot.cn/v1", "models": []'
+# Special Case: DeepSeek Direct API
+elif [[ "$PROVIDER" == "deepseek" ]]; then
+  PROVIDER_EXTRAS=', "baseUrl": "https://api.deepseek.com", "models": []'
+fi
+
+# Create openclaw.json using tee (loopback binding for SSH Tunneling security)
+cat <<EOF | sudo -u $USER tee /home/$USER/.openclaw/openclaw.json > /dev/null
 {
-  \"gateway\": {
-    \"mode\": \"local\",
-    \"bind\": \"auto\",
-    \"auth\": {
-      \"mode\": \"token\",
-      \"token\": \"openclaw-token-\$$(openssl rand -hex 16)\"
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "$GATEWAY_TOKEN"
     }
   },
-  \"models\": {
-    \"providers\": {
-      \"$${PROVIDER}\": {
-        \"apiKey\": \"${LLM_API_KEY}\"$( [[ "$${PROVIDER}" == "moonshot" ]] && echo ",
-        \"baseUrl\": \"https://api.moonshot.cn/v1\",
-        \"models\": [{\"id\": \"kimi-k2.5\", \"name\": \"Kimi k2.5\"}, {\"id\": \"moonshot-v1-8k\", \"name\": \"Moonshot v1 8k\"}, {\"id\": \"moonshot-v1-32k\", \"name\": \"Moonshot v1 32k\"}, {\"id\": \"moonshot-v1-128k\", \"name\": \"Moonshot v1 128k\"}]" )
+  "models": {
+    "providers": {
+      "$PROVIDER": {
+        "apiKey": "$LLM_API_KEY"$PROVIDER_EXTRAS
       }
     }
   },
-  \"agents\": {
-    \"defaults\": {
-      \"model\": {
-        \"primary\": \"$${PROVIDER}/$${MODEL}\"
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "$PROVIDER/$MODEL"
       }
     }
   }
 }
-EOF"
+EOF
 
 # Automatically fix/fill provider-specific configuration (important for Moonshot/Gemini)
 sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive
 
 # Start OpenClaw Gateway as a service only if API Key is provided
-if [[ "${LLM_API_KEY}" != "none" && -n "${LLM_API_KEY}" ]]; then
-  # Use full path and handle cases where it might already be running
-  # Use full path and explicit interpreter to avoid Node.js syntax errors
-  sudo -u $USER pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run || sudo -u $USER pm2 restart openclaw
-  sudo -u $USER pm2 save
-  # PM2 startup can be tricky in non-interactive shells; allow it to fail if already configured
+if [[ "$LLM_API_KEY" != "none" && -n "$LLM_API_KEY" ]]; then
+  # Ensure PM2 has the right environment and retry start
+  sudo -u $USER /usr/bin/pm2 delete openclaw >/dev/null 2>&1 || true
+  sudo -u $USER /usr/bin/pm2 start /home/$USER/.local/bin/openclaw --interpreter bash --name openclaw -- gateway run
+  sudo -u $USER /usr/bin/pm2 save
+  
+  # Wait and verify listening port
+  echo "⌛ Waiting for OpenClaw to start listening on port 18789..."
+  sleep 5
+  if ! netstat -tulnp | grep -q ":18789"; then
+      echo "⚠️ OpenClaw is NOT listening on port 18789. Checking doctor..."
+      sudo -u $USER /home/$USER/.local/bin/openclaw doctor --fix --non-interactive || true
+      sudo -u $USER /usr/bin/pm2 restart openclaw
+      sleep 5
+  fi
+
+  # PM2 startup setup
   sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER || true
   sudo systemctl enable pm2-$USER || true
   sudo systemctl start pm2-$USER || true
-  STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
-  LOG_INFO="    Check logs: pm2 logs openclaw (or run ~/check-progress.sh for setup history)"
-  ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
+  
+  if netstat -tulnp | grep -q ":18789"; then
+      STATUS_LINE=" ✅ OpenClaw is RUNNING (Managed by PM2)"
+      LOG_INFO="    Check logs: pm2 logs openclaw"
+      ONBOARD_INFO="    👉 Run 'openclaw onboard' to finish setup!"
+      HELP_TIPS="    💡 Security: Web UI is bound to localhost with a secure token.
+    🔗 Access: Click this link (Requires SSH Tunnel):
+       http://localhost:18789/#token=$GATEWAY_TOKEN"
+  else
+      STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
+      LOG_INFO="    Run: pm2 logs openclaw --lines 50"
+      ONBOARD_INFO="    Try: openclaw doctor --fix"
+      HELP_TIPS="    Common Cause: Invalid API Key or Config Issue."
+  fi
 else
   STATUS_LINE=" ⚠️ OpenClaw is INSTALLED but NOT STARTED"
   LOG_INFO="    Action: Run ~/check-progress.sh to see setup logs, then start manually."
-  ONBOARD_INFO="    (Check ~/check-progress.sh for details)"
+  ONBOARD_INFO="    (LLM_API_KEY was not set during deployment)"
+  HELP_TIPS="    Action: Edit ~/.openclaw/openclaw.json then 'pm2 start openclaw'"
 fi
 
-# 6. Configure Firewall
-sudo iptables -A INPUT -p tcp --dport 18789 -j ACCEPT
+# 6. Configure Firewall (SSH only, Gateway via Tunnel)
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent netfilter-persistent
 sudo netfilter-persistent save
 
@@ -158,4 +225,5 @@ echo -e "=============================================================" | sudo t
 echo -e "$${STATUS_LINE}" | sudo tee -a /etc/motd
 echo -e "$${LOG_INFO}" | sudo tee -a /etc/motd
 echo -e "$${ONBOARD_INFO}" | sudo tee -a /etc/motd
+echo -e "$${HELP_TIPS}" | sudo tee -a /etc/motd
 echo -e "=============================================================" | sudo tee -a /etc/motd
