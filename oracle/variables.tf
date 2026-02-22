@@ -1,11 +1,26 @@
-# 1. OCI Authentication
-variable "tenancy_ocid" {}
-variable "user_ocid" {}
-variable "fingerprint" {}
-variable "private_key_path" {}
-variable "region" {}
-variable "compartment_ocid" {}
-variable "ssh_public_key" {}
+variable "tenancy_ocid" {
+  description = "OCI Tenancy OCID"
+}
+variable "user_ocid" {
+  description = "OCI User OCID"
+}
+variable "fingerprint" {
+  description = "Fingerprint of the API private key"
+}
+variable "private_key_path" {
+  description = "Local path to the API private key"
+}
+variable "compartment_ocid" {
+  description = "OCI Compartment OCID where resources will be created"
+}
+
+variable "region" {
+  description = "OCI Region (e.g., us-ashburn-1)"
+}
+
+variable "ssh_public_key" {
+  description = "SSH public key to be added to the instance"
+}
 
 # 2. Project Configuration
 variable "namespace" {
@@ -54,9 +69,9 @@ variable "ssh_user" {
 
 # 4. OpenClaw Configuration
 variable "openclaw_model" {
-  description = "The AI model to use (e.g., claude-3-5-sonnet-20241022)"
+  description = "The AI model to use (defaulting to the latest 3.5 Sonnet)"
   type        = string
-  default     = "claude-3-5-sonnet-20241022"
+  default     = "claude-3-5-sonnet-latest"
 }
 
 variable "llm_api_key" {

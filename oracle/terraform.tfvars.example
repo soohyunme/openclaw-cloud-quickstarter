@@ -1,17 +1,29 @@
-# === Oracle Always Free Tier (Default) ===
+# =============================================================
+# OCI Connection & Auth (COPY FROM CLOUDSHELL)
+# =============================================================
+# tenancy_ocid     = "ocid1.tenancy.oc1..xxxxxx"
+# user_ocid        = "ocid1.user.oc1..xxxxxx"
+# fingerprint      = "xx:xx:xx:xx..."
+# private_key_path = "oracle_api_key.pem"
+# region           = "ap-seoul-1"
+# compartment_ocid = "ocid1.compartment.oc1..xxxxxx"
+# ssh_public_key   = "ssh-rsa AAAA..."
+
+# =============================================================
+# Instance Configuration (Default: Always Free ARM)
+# =============================================================
 # instance_shape        = "VM.Standard.A1.Flex"
 # instance_ocpus        = 4
 # instance_memory_in_gbs = 24
 # boot_volume_size_in_gbs = 50
 # availability_domain_number = 1
 
-# === Performance Config (Paid) ===
-# Uncomment below for paid shapes (Intel/AMD)
-# instance_shape        = "VM.Standard.E4.Flex" 
-# instance_ocpus        = 8
-# instance_memory_in_gbs = 64
-# boot_volume_size_in_gbs = 200
+# =============================================================
+# OpenClaw Platform
+# =============================================================
+# openclaw_model = "claude-3-5-sonnet-latest"
+# llm_api_key    = "none" # Use onboarder for easy setup
 
-# === OpenClaw AI Model ===
-# openclaw_model = "claude-3-5-sonnet-20241022"
-# llm_api_key    = "sk-ant-..."
+# 💡 TIP: 
+# After 'terraform apply', run 'openclaw onboard' on the server 
+# to configure your AI models and personas interactively!

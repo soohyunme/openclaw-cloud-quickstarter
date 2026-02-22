@@ -110,9 +110,11 @@ resource "aws_instance" "openclaw_server" {
   vpc_security_group_ids      = [aws_security_group.openclaw_sg.id]
   associate_public_ip_address = true
 
-  user_data = base64encode(templatefile("${path.module}/scripts/setup.sh", {
+  user_data = base64encode(templatefile("${path.module}/../scripts/bootstrap.sh", {
+      CLOUD_PROVIDER   = "aws"
       OPENCLAW_MODEL   = var.openclaw_model
       LLM_API_KEY      = var.llm_api_key
+      USER             = "ubuntu"
   }))
 
   root_block_device {

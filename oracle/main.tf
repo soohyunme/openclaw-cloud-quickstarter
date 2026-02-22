@@ -95,7 +95,8 @@ resource "oci_core_instance" "openclaw_server" {
 
   metadata = {
     ssh_authorized_keys = var.ssh_public_key
-    user_data           = base64encode(templatefile("${path.module}/scripts/setup.sh", {
+    user_data           = base64encode(templatefile("${path.module}/../scripts/bootstrap.sh", {
+      CLOUD_PROVIDER   = "oracle"
       OPENCLAW_MODEL   = var.openclaw_model
       LLM_API_KEY      = var.llm_api_key
       USER             = var.ssh_user

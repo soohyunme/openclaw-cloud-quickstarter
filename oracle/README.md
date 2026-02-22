@@ -31,7 +31,6 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
     export TF_VAR_region="your-region-1"
     export TF_VAR_compartment_ocid="ocid1.compartment..."
     export TF_VAR_ssh_public_key="ssh-rsa AAAA..."
-    export TF_VAR_llm_api_key="your-api-key-here"
     ```
 4.  **Deploy! 🏗️**
     ```bash
@@ -42,6 +41,7 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
 
 > [!TIP]
 > To skip the confirmation prompt, you can use `terraform apply -auto-approve`.
+
 5.  **📥 DOWNLOAD CRITICAL FILES NOW!**
     Use the Cloud Shell **"Actions" > "Download File"** menu (top right) to save these to your local PC:
     - `.ssh/id_rsa` (If you generated a key) or your private key file
@@ -52,7 +52,26 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
 
 ---
 
-### 🔵 Phase 2: On Your Local PC (Access & Monitoring)
+### 🔵 Phase 2: Finish Setup (Onboarding)
+
+Once infrastructure is deployed, you must run the official onboarding wizard to configure your AI models.
+
+1.  **Connect to your instance:**
+    (Use the SSH command provided in the Terraform output)
+2.  **Monitor installation:**
+    ```bash
+    ./check-progress.sh
+    ```
+3.  **Run Onboarding Wizard:**
+    When setup is complete, run:
+    ```bash
+    openclaw onboard
+    ```
+    Follow the prompts to add your API keys (Anthropic, OpenAI, etc.). OpenClaw will handle the rest!
+
+---
+
+### 🟣 Phase 3: Monitoring & Control
 
 Now that the instance is up, you can move to your local computer's terminal (Mac, Linux, or WSL).
 
@@ -79,21 +98,20 @@ Now that the instance is up, you can move to your local computer's terminal (Mac
     ./check-progress.sh
     ```
 
-4.  **Access the Dashboard:**
-    Once complete, **copy the full access link (including the #token=... part)** shown in your terminal and paste it into your browser:
-    `http://localhost:18789/#token=...`
+    While the installation runs, notice that your **Dynamic MOTD** is already being prepared. Once complete, you can access the dashboard using the full link (with token) shown in the terminal.
 
 ---
 
-## 📊 Management & Monitoring
+## 📊 Management & Onboarding
 
-### 🪄 The Onboarding Wizard (Advanced Setup)
-
-Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session (the terminal from Phase 2):
+### 🪄 The Onboarding Wizard
+Want to connect **Discord**, **Telegram**, or change your agent's **Persona**? Run the interactive wizard inside your SSH session:
 
 ```bash
 openclaw onboard
 ```
+> [!TIP]
+> **Lost your token?** Simply log in again! The **Dynamic MOTD** will show your live dashboard link and token on every login.
 > [!TIP]
 > If the command is not found, run `source ~/.bashrc` first or use the full path: `~/.local/bin/openclaw onboard`.
 
@@ -108,7 +126,6 @@ pm2 logs openclaw
 ### 🧹 Clean Up (Destroy)
 To remove all resources and stop billing (if any):
 ```bash
-export TF_VAR_llm_api_key="none" # Skip key prompt
 terraform destroy
 ```
 
@@ -116,19 +133,28 @@ terraform destroy
 > To skip the confirmation prompt during cleanup, use: `terraform destroy -auto-approve`
 
 ## ⚠️ Troubleshooting
-*   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain.
-*   **"Control UI requires device identity" or "device token mismatch":**
-    1.  Ensure you are using the **SSH Tunnel** (Method 2) via `http://localhost:18789`.
-    2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.
-    3.  Alternatively, run this on the server to get a fresh login URL:
+*   **"Out of Host Capacity" Error:** Oracle Free Tier ARM instances are popular and sometimes out of stock. Retry later or try another availability domain (AD).
+*   **"Control UI requires device identity", "pairing required", or "device token mismatch":**
+    - This is the most common issue. OpenClaw uses secure tokens for identification.
+    - **Solution:** Always access the dashboard using the **Full URL with Token** (e.g., `http://localhost:18789/#token=...`).
+    - If you lost your token, run this on your server:
+        ```bash
+        cat ~/.openclaw/gateway_token
+        ```
+    - Or generate a fresh login URL:
         ```bash
         openclaw dashboard --no-open
         ```
-    4.  **Copy the FULL URL** (e.g., `http://localhost:18789/#token=...`) and paste it into your browser. This bypasses the session conflict.
-    5.  If it still asks for a token, you can generate one manually on the server:
-        ```bash
-        openclaw doctor --generate-gateway-token
-        ```
+    - **Step-by-Step Recovery:**
+        1.  Ensure your **SSH Tunnel** is active.
+        2.  Clear your browser cookies/local storage for `localhost:18789`.
+        3.  Copy/Paste the **FULL URL** from the command above into your browser.
+
+## 📝 Notes on Free Tier
+*   **Always Free ARM:** This template uses the `VM.Standard.A1.Flex` shape (4 OCPUs, 24 GB RAM for free).
+    - *Tip*: You can override this by running `export TF_VAR_instance_shape="VM.Standard.E2.1.Micro"` before `terraform apply`.
+*   **Quotas:** If you have other instances, you might hit your 4 OCPU limit. Ensure you have enough quota or adjust `variables.tf`.
+*   **Idle Termination:** Oracle may reclaim idle instances. Keep your agent active or check [Oracle's policy](https://www.oracle.com/cloud/free/#always-free).
 
 ---
 **Enjoy your personal AI Agent! 🦞**
