@@ -32,17 +32,10 @@ CloudShell sessions are temporary. To avoid losing your files, we use a **Two-Ph
     git clone https://github.com/soohyunme/openclaw-cloud-quickstarter.git
     cd openclaw-cloud-quickstarter/aws
     ```
-4.  **Generate SSH Key** (If you don't have one):
-    ```bash
-    ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-    ```
-5.  **Set your region:**
-    ```bash
-    export TF_VAR_aws_region=$AWS_REGION
-    ```
-6.  **Deploy! 🏗️**
+4.  **Deploy! 🏗️**
     ```bash
     terraform init
+    export TF_VAR_aws_region=$AWS_REGION
     terraform apply
     ```
     Type **yes** when prompted.
