@@ -6,6 +6,8 @@ output "public_ip" {
 output "setup_instructions" {
   value = <<EOT
 
+⚠️ WARNING: Oracle Cloud Support is currently COMING SOON / UNDER DEVELOPMENT.
+
 ✅ Oracle Cloud VM Created & Configuration Started!
 
 1. CONNECT & MONITOR (Wait ~15 mins):

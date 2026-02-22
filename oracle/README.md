@@ -1,5 +1,8 @@
 # 🦞 OpenClaw Oracle Starter (Always Free)
 
+> [!WARNING]
+> **🚧 Under Development (Coming Soon)**: Oracle Cloud support is still being prepared and is not yet fully stable. Please use **AWS** for a stable production environment.
+
 Create your own **OpenClaw AI Agent** on **Oracle Cloud Infrastructure (OCI)** in minutes.
 This Terraform template provisions a **Free Tier (Always Free)** compatible VM (ARM Ampere A1) and automatically installs:
 1.  **OpenClaw:** The AI agent platform
