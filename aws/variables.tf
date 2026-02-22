@@ -35,16 +35,3 @@ variable "private_key_path" {
   default     = "~/.ssh/id_rsa"
 }
 
-# OpenClaw Configuration
-variable "openclaw_model" {
-  description = "The AI model to use (e.g., claude-3-5-sonnet-20241022)"
-  type        = string
-  default     = "claude-3-5-sonnet-20241022"
-}
-
-variable "llm_api_key" {
-  description = "Your LLM API Key (e.g., Anthropic 'sk-ant-...' or OpenAI 'sk-...')"
-  type        = string
-  sensitive   = true
-  default     = "none"
-}

@@ -112,8 +112,6 @@ resource "aws_instance" "openclaw_server" {
 
   user_data = base64encode(templatefile("${path.module}/../scripts/bootstrap.sh", {
       CLOUD_PROVIDER   = "aws"
-      OPENCLAW_MODEL   = var.openclaw_model
-      LLM_API_KEY      = var.llm_api_key
       USER             = "ubuntu"
   }))
 

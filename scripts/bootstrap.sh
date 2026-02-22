@@ -8,8 +8,6 @@ set -euo pipefail
 # These are injected by Terraform templatefile()
 USER="${USER}"
 CLOUD_PROVIDER="${CLOUD_PROVIDER}"
-OPENCLAW_MODEL="${OPENCLAW_MODEL}"
-LLM_API_KEY="${LLM_API_KEY}"
 GATEWAY_TOKEN=$(openssl rand -hex 16)
 NODE_VERSION="20.x"
 PNPM_VERSION="latest"

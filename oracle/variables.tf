@@ -67,16 +67,3 @@ variable "ssh_user" {
   default     = "ubuntu"
 }
 
-# 4. OpenClaw Configuration
-variable "openclaw_model" {
-  description = "The AI model to use (defaulting to the latest 3.5 Sonnet)"
-  type        = string
-  default     = "claude-3-5-sonnet-latest"
-}
-
-variable "llm_api_key" {
-  description = "Your LLM API Key (e.g., Anthropic 'sk-ant-...' or OpenAI 'sk-...')"
-  type        = string
-  sensitive   = true
-  default     = "none"
-}
