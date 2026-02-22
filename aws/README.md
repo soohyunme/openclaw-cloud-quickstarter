@@ -133,7 +133,6 @@ Once infrastructure is deployed, you must run the official onboarding wizard to 
 To remove all resources and stop billing (if any):
 ```bash
 export TF_VAR_aws_region=$AWS_REGION
-export TF_VAR_llm_api_key="none" # Skip key prompt
 terraform destroy
 ```
 
@@ -141,18 +140,21 @@ terraform destroy
 > To skip the confirmation prompt during cleanup, use: `terraform destroy -auto-approve`
 
 ## ⚠️ Troubleshooting
-*   **"Control UI requires device identity" or "device token mismatch":**
-    1.  Ensure you are using the **SSH Tunnel** (Phase 2) via `http://localhost:18789`.
-    2.  If the error persists, clear your browser's local storage/cookies for `localhost:18789`.
-    3.  Alternatively, run this on the server to get a fresh login URL:
+*   **"Control UI requires device identity", "pairing required", or "device token mismatch":**
+    - This is the most common issue. OpenClaw uses secure tokens for identification.
+    - **Solution:** Always access the dashboard using the **Full URL with Token** (e.g., `http://localhost:18789/#token=...`).
+    - If you lost your token, run this on your server:
+        ```bash
+        cat ~/.openclaw/gateway_token
+        ```
+    - Or generate a fresh login URL:
         ```bash
         openclaw dashboard --no-open
         ```
-    4.  **Copy the FULL URL** (e.g., `http://localhost:18789/#token=...`) and paste it into your browser. This bypasses the session conflict.
-    5.  If it still asks for a token, you can generate one manually on the server:
-        ```bash
-        openclaw doctor --generate-gateway-token
-        ```
+    - **Step-by-Step Recovery:**
+        1.  Ensure your **SSH Tunnel** is active.
+        2.  Clear your browser cookies/local storage for `localhost:18789`.
+        3.  Copy/Paste the **FULL URL** from the command above into your browser.
 
 ## 📝 Notes on Free Tier
 *   **Instance Type:** This template defaults to `t3.micro` for maximum compatibility with the AWS 12-month Free Tier.

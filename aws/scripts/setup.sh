@@ -145,16 +145,6 @@ sudo env PATH=$PATH /usr/bin/node /usr/lib/node_modules/pm2/bin/pm2 startup syst
 sudo systemctl enable pm2-$USER || true
 sudo systemctl start pm2-$USER || true
 
-if netstat -tulnp | grep -q ":18789"; then
-    STATUS_LINE=" ✅ OpenClaw Platform is READY"
-    LOG_INFO="    Join Dashboard: http://localhost:18789/#token=$GATEWAY_TOKEN"
-    ONBOARD_INFO="    👉 Run 'openclaw onboard' to set up your AI models!"
-    HELP_TIPS="    💡 Security: Web UI is bound to localhost with a secure token."
-else
-    STATUS_LINE=" ❌ ERROR: OpenClaw failed to listen on port 18789"
-    LOG_INFO="    Run: pm2 logs openclaw --lines 50"
-    ONBOARD_INFO="    Try: openclaw doctor --fix"
-    HELP_TIPS="    Common Cause: Low resources or config conflict."
 fi
 
 # 6. Configure Firewall (SSH only, Gateway via Tunnel)
@@ -166,15 +156,34 @@ sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent netfilter-persistent
 sudo netfilter-persistent save
 
-# 7. Add MOTD
-echo -e "\n\n" | sudo tee -a /etc/motd
-echo -e "=============================================================" | sudo tee -a /etc/motd
-echo -e " 🦞 Welcome to Your OpenClaw Server on Amazon Web Services! " | sudo tee -a /etc/motd
-echo -e "=============================================================" | sudo tee -a /etc/motd
-echo -e "$${STATUS_LINE:-Status: Unknown}" | sudo tee -a /etc/motd
-echo -e "$${LOG_INFO:-}" | sudo tee -a /etc/motd
-echo -e "$${ONBOARD_INFO:-}" | sudo tee -a /etc/motd
-echo -e "$${HELP_TIPS:-}" | sudo tee -a /etc/motd
-echo -e "=============================================================" | sudo tee -a /etc/motd
+# 7. Add Dynamic MOTD
+# This script runs on every login to show real-time status and the current token.
+cat <<'DYN_MOTD' | sudo tee /etc/update-motd.d/99-openclaw > /dev/null
+#!/bin/bash
+USER="ubuntu"
+CONFIG="/home/$USER/.openclaw/openclaw.json"
+
+echo "============================================================="
+echo " 🦞 Welcome to Your OpenClaw Server! "
+echo "============================================================="
+
+if [ -f "$CONFIG" ]; then
+    TOKEN=$(grep '"token":' "$CONFIG" | cut -d'"' -f4)
+    if netstat -tulnp | grep -q ":18789"; then
+        echo " ✅ OpenClaw Platform is READY"
+        echo "    Join Dashboard: http://localhost:18789/#token=$TOKEN"
+        echo "    👉 Run 'openclaw onboard' to set up your AI models!"
+    else
+        echo " ❌ ERROR: OpenClaw is NOT listening on port 18789"
+        echo "    Run: pm2 logs openclaw --lines 50"
+    fi
+else
+    echo " ⚠️ OpenClaw configuration not found at $CONFIG"
+fi
+echo "============================================================="
+DYN_MOTD
+sudo chmod +x /etc/update-motd.d/99-openclaw
+# Remove any static MOTD appends to keep it clean
+sudo truncate -s 0 /etc/motd || true
 
 echo "--- Setup Completed at $(date) ---"
